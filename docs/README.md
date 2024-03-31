@@ -7,7 +7,7 @@ There are different types:
 
 TODO:
 - **Like**: Boolean behavior of voting thumbs up/down for "like" vs "dislike".
-- **Custom**: Enum like list of possible values between int(-128...128) mapped to a int|string value.
+- **Custom**: Enum like list of possible values between int(-128...128) mapped to a map of `int|string` values or PHP enum and its values.
 
 ## Strategies
 
