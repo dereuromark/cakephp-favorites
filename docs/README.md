@@ -1,26 +1,33 @@
 # Favorites Plugin docs
 
+## Types
+There are different types:
+
+- **Favorite**: Binary (yes, no) on a record, so either favorite or not.
+
+TODO:
+- **Like**: Enum like behavior of voting "up, down".
+- **Custom**: Enum like list of possible values between int(-128...128) mapped to a int|string value.
+
 ## Strategies
+
 There are different main strategies:
 
-- **Action**: Posting to the same action as the favorites are displayed, e.g. a specific entity view
 - **Controller**: Posting to the plugin Favorites controller with a redirect back to the referer (current view)
+- **Action**: Posting to the same action as the favorite info is displayed, e.g. a specific entity view
 
 Each of those can also be done using AJAX instead of normal PRG.
 
-### Action
-
-Preferred way, directly posting to the same action.
-It uses the beforeRender() callback as that one has already the main entity loaded in the view vars.
-
-
-
 ### Controller
 
-This can be needed, if you cannot post to the same action due to a conflict, e.g.
-PRG redirect pattern interfering, or another `request->is('post')` check in that action already.
+Preferred way is posting to the specific controllers using AJAX with PRG fallback.
+It has less change of colliding with a different form on that action.
 
-Make sure to set ACL for this controller if only logged in people are allowed to comment.
+Make sure to set ACL for this controller as only logged in people are allowed to use this.
+
+### Action
+
+This can be needed, if you want to display a validation result on the form itself for invalidation.
 
 ## Admin Backend
 Go to `/admin/favorites`.

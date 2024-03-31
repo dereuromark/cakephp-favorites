@@ -16,7 +16,7 @@ This branch is for use with **CakePHP 5.0+**. For details see [version map](http
 
 ## Motivation
 
-The old Favorites plugins dont seem to be supported anymore:
+The old Favorites plugins don't seem to be supported anymore:
 - https://github.com/CakeDC/favorites (Cake 2)
 - Similar to https://github.com/aschelch/cakephp-like-plugin (Cake 2)
 
@@ -45,6 +45,8 @@ Help is appreciated.
 
 A "counter-cache" field can be put on the starred record itself, to more easily count the
 "stars" without having to calculate it at runtime.
+
+For ratings (e.g. 1-5 star range) use https://github.com/dereuromark/cakephp-ratings instead.
 
 ### Install, Setup, Usage
 See the **[Docs](docs/README.md)** for details.

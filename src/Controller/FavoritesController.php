@@ -4,6 +4,7 @@ namespace Favorites\Controller;
 
 use App\Controller\AppController;
 use Cake\Core\Configure;
+use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
 use TinyAuth\Controller\Component\AuthComponent;
 use TinyAuth\Controller\Component\AuthUserComponent;
@@ -38,7 +39,6 @@ class FavoritesController extends AppController {
 	 */
 	public function add($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'put', 'patch']);
-		$data = $this->request->getData();
 
 		$model = Configure::read('Favorites.controllerModels.' . $alias);
 		if (!$model) {
@@ -47,11 +47,20 @@ class FavoritesController extends AppController {
 		$table = $this->fetchTable($model);
 		$entity = $table->get($id);
 
-		$data['model'] = $model;
-		$data['foreign_key'] = $entity->get('id');
-		$data['user_id'] = $this->userId();
+		$uid = $this->userId();
+		if (!$uid) {
+			throw new MethodNotAllowedException('Must be logged in to remove favorite');
+		}
+		/** @var string|float|int|bool|null $value */
+		$value = $this->request->getData('value');
+		if ($value !== null) {
+			$value = (int)$value;
+		}
+		if ($value === 0) {
+			$value = null;
+		}
 
-		$result = $this->Favorites->add($data);
+		$result = $this->Favorites->add($model, $entity->get('id'), $uid, $value);
 		if (!$result->isNew()) {
 			$this->Flash->error(__d('favorites', 'Could not save favorite, please try again.'));
 		}
@@ -67,7 +76,6 @@ class FavoritesController extends AppController {
 	 */
 	public function remove($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'delete']);
-		$data = $this->request->getData();
 
 		$model = Configure::read('Favorites.controllerModels.' . $alias);
 		if (!$model) {
@@ -76,11 +84,12 @@ class FavoritesController extends AppController {
 		$table = $this->fetchTable($model);
 		$entity = $table->get($id);
 
-		$data['model'] = $model;
-		$data['foreign_key'] = $entity->get('id');
-		$data['user_id'] = $this->userId();
+		$uid = $this->userId();
+		if (!$uid) {
+			throw new MethodNotAllowedException('Must be logged in to remove favorite');
+		}
 
-		$this->Favorites->remove($data);
+		$this->Favorites->remove($model, $entity->get('id'), $uid);
 
 		return $this->redirect($this->referer(['action' => 'index']));
 	}

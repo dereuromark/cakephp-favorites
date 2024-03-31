@@ -97,14 +97,9 @@ class FavorableBehavior extends Behavior {
 	 * @return int|null
 	 */
 	public function addFavorite(array $options = []) {
-		$options += ['defaultTitle' => '', 'model' => null, 'modelId' => null, 'userId' => null, 'data' => [], 'permalink' => ''];
+		$options += ['value' => null, 'model' => null, 'modelId' => null, 'userId' => null];
 
-		$data = [];
-		$data['user_id'] = $options['userId'];
-		$data['model'] = $options['model'];
-		$data['foreign_key'] = $options['modelId'];
-
-		$favorite = $this->favoritesTable()->add($data);
+		$favorite = $this->favoritesTable()->add($options['model'], $options['modelId'], $options['userId'], $options['value']);
 		if (!$favorite->isNew()) {
 			return $favorite->id;
 		}

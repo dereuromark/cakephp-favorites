@@ -309,6 +309,8 @@ class FavoriteComponent extends Component {
 	 * @return mixed
 	 */
 	protected function add(array $data) {
+		assert($this->viewVariable !== null);
+
 		/** @var \Cake\Datasource\EntityInterface $entity */
 		$entity = $this->Controller->viewBuilder()->getVar($this->viewVariable);
 
@@ -358,6 +360,7 @@ class FavoriteComponent extends Component {
 			throw new RuntimeException('FavoritesComponent: model ' . $this->modelAlias . ' or association ' . $this->assocName . ' doesn\'t exist');
 		}
 
+		assert($this->viewVariable !== null);
 		/** @var \Cake\Datasource\EntityInterface|null $entity */
 		$entity = $this->Controller->viewBuilder()->getVar($this->viewVariable);
 
@@ -576,10 +579,16 @@ class FavoriteComponent extends Component {
 		$methodName = 'callbackFavorites' . Inflector::camelize(Inflector::underscore($method));
 		$localMethodName = 'callback' . $method;
 		if (method_exists($this->Controller, $methodName)) {
-			return call_user_func_array([$this->Controller, $methodName], $args);
+			/** @var callable $callable */
+			$callable = [$this->Controller, $methodName];
+
+			return call_user_func_array($callable, $args);
 		}
 		if (method_exists($this, $localMethodName)) {
-			return call_user_func_array([$this, $localMethodName], $args);
+			/** @var callable $callable */
+			$callable = [$this, $localMethodName];
+
+			return call_user_func_array($callable, $args);
 		}
 
 			throw new BadMethodCallException();

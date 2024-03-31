@@ -21,14 +21,19 @@ class PluginFavorites extends AbstractMigration {
 				'signed' => false,
 			])
 			->addColumn('model', 'string', [
-				'default' => '',
+				'default' => null,
 				'limit' => 80,
 				'null' => false,
 			])
 			->addColumn('user_id', 'integer', [
 				'default' => null,
-				'null' => true,
+				'null' => false,
 				'signed' => false,
+			])
+			->addColumn('value', 'tinyinteger', [
+				'default' => null,
+				'null' => true,
+				'signed' => true,
 			])
 			->addColumn('created', 'datetime', [
 				'default' => null,

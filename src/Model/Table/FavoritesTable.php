@@ -6,7 +6,6 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Favorites\Model\Entity\Favorite;
-use InvalidArgumentException;
 
 /**
  * Favorites Model
@@ -77,25 +76,26 @@ class FavoritesTable extends Table {
 	}
 
 	/**
-	 * @param array<string, mixed> $data
+	 * @param string $model
+	 * @param int $foreignKey
+	 * @param int $userId
+	 * @param int|null $value
 	 *
 	 * @return \Favorites\Model\Entity\Favorite
 	 */
-	public function add(array $data): Favorite {
-		if (empty($data['model'])) {
-			throw new InvalidArgumentException('model is required');
-		}
-		if (empty($data['foreign_key'])) {
-			throw new InvalidArgumentException('foreign_key is required');
-		}
-		if (empty($data['user_id'])) {
-			throw new InvalidArgumentException('user_id is required');
-		}
+	public function add(string $model, int $foreignKey, int $userId, ?int $value = null): Favorite {
+		$data = [
+			'model' => $model,
+			'foreign_key' => $foreignKey,
+			'user_id' => $userId,
+		];
 
 		$favorite = $this->findOrCreate($data);
 		if ($favorite->hasErrors()) {
 			return $favorite;
 		}
+
+		$favorite->value = $value;
 
 		$this->saveOrFail($favorite);
 
@@ -103,20 +103,18 @@ class FavoritesTable extends Table {
 	}
 
 	/**
-	 * @param array<string, mixed> $data
+	 * @param string $model
+	 * @param int $foreignKey
+	 * @param int $userId
 	 *
 	 * @return int
 	 */
-	public function remove(array $data): int {
-		if (empty($data['model'])) {
-			throw new InvalidArgumentException('model is required');
-		}
-		if (empty($data['foreign_key'])) {
-			throw new InvalidArgumentException('foreign_key is required');
-		}
-		if (empty($data['user_id'])) {
-			throw new InvalidArgumentException('user_id is required');
-		}
+	public function remove(string $model, int $foreignKey, int $userId): int {
+		$data = [
+			'model' => $model,
+			'foreign_key' => $foreignKey,
+			'user_id' => $userId,
+		];
 
 		return $this->deleteAll($data);
 	}

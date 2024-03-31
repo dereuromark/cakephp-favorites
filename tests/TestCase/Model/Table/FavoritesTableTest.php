@@ -57,24 +57,14 @@ class FavoritesTableTest extends TestCase {
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(1, $favorites);
 
-		$result = $this->Favorites->add([
-			'foreign_key' => 1,
-			'model' => 'Posts',
-			'user_id' => 1,
-		]);
+		$result = $this->Favorites->add('Posts', 1, 1);
 		$this->assertFalse($result->isNew());
 
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(1, $favorites);
 
-		return;
-
-		$result = $this->Favorites->add([
-			'foreign_key' => 1,
-			'model' => 'X',
-			'user_id' => 1,
-		]);
-		$this->assertTrue($result);
+		$result = $this->Favorites->add('X', 1, 1);
+		$this->assertFalse($result->isNew());
 
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(2, $favorites);
@@ -87,21 +77,13 @@ class FavoritesTableTest extends TestCase {
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(1, $favorites);
 
-		$result = $this->Favorites->remove([
-			'foreign_key' => 1,
-			'model' => 'Posts',
-			'user_id' => 1,
-		]);
+		$result = $this->Favorites->remove('Posts', 1, 1);
 		$this->assertSame(1, $result);
 
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(0, $favorites);
 
-		$result = $this->Favorites->remove([
-			'foreign_key' => 1,
-			'model' => 'X',
-			'user_id' => 1,
-		]);
+		$result = $this->Favorites->remove('X', 1, 1);
 		$this->assertSame(0, $result);
 
 		$favorites = $this->Favorites->find()->all()->toArray();

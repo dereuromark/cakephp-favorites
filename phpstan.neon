@@ -7,3 +7,4 @@ parameters:
 	bootstrapFiles:
 		- tests/bootstrap.php
 	ignoreErrors:
+		- '#Access to an undefined property .+Table::\$Favorites.#'
