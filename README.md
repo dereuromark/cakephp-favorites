@@ -1,6 +1,6 @@
 #  CakePHP Favorites Plugin
 
-[![CI](https://github.com/dereuromark/cakephp-favorites/workflows/CI/badge.svg?branch=master)](https://github.com/dereuromark/cakephp-favorites/actions?query=workflow%3ACI+branch%3Amaster)
+[![CI](https://github.com/dereuromark/cakephp-favorites/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/dereuromark/cakephp-favorites/actions?query=workflow%3ACI+branch%3Amaster)
 [![Coverage Status](https://img.shields.io/codecov/c/github/dereuromark/cakephp-favorites/master.svg)](https://app.codecov.io/github/dereuromark/cakephp-favorites/tree/master)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat)](https://phpstan.org/)
 [![Latest Stable Version](https://poser.pugx.org/dereuromark/cakephp-favorites/v/stable.svg)](https://packagist.org/packages/dereuromark/cakephp-favorites)
