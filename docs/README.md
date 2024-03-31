@@ -3,7 +3,7 @@
 ## Types
 There are different types:
 
-- **Favorite**: Binary (set=yes, unset=no) on a record, so either favorite or not.
+- **Favorite**: Binary (set=yes, unset=no) on a record, so either favorite or not. Basically a "like" without being able to "dislike".
 
 TODO:
 - **Like**: Boolean behavior of voting thumbs up/down for "like" vs "dislike".
