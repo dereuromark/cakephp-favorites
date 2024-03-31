@@ -14,6 +14,8 @@ TODO:
 There are different main strategies:
 
 - **Controller**: Posting to the plugin Favorites controller with a redirect back to the referer (current view)
+
+TODO:
 - **Action**: Posting to the same action as the favorite info is displayed, e.g. a specific entity view
 
 Each of those can also be done using AJAX instead of normal PRG.
