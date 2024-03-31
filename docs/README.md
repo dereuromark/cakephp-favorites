@@ -3,10 +3,10 @@
 ## Types
 There are different types:
 
-- **Favorite**: Binary (yes, no) on a record, so either favorite or not.
+- **Favorite**: Binary (set=yes, unset=no) on a record, so either favorite or not.
 
 TODO:
-- **Like**: Enum like behavior of voting "up, down".
+- **Like**: Boolean behavior of voting thumbs up/down for "like" vs "dislike".
 - **Custom**: Enum like list of possible values between int(-128...128) mapped to a int|string value.
 
 ## Strategies
