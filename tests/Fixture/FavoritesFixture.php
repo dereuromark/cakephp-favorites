@@ -25,6 +25,7 @@ class FavoritesFixture extends TestFixture {
 		'foreign_key' => ['type' => 'integer', 'length' => null, 'unsigned' => true, 'null' => false, 'default' => null, 'comment' => ''],
 		'model' => ['type' => 'string', 'length' => 80, 'null' => false, 'default' => '', 'comment' => ''],
 		'user_id' => ['type' => 'integer', 'length' => null, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => ''],
+		'value' => ['type' => 'tinyinteger', 'length' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
 		'created' => ['type' => 'datetime', 'length' => null, 'null' => false, 'default' => null, 'comment' => ''],
 		'_indexes' => [
 			'user_id' => ['type' => 'index', 'columns' => ['user_id'], 'length' => []],
@@ -46,6 +47,7 @@ class FavoritesFixture extends TestFixture {
 				'foreign_key' => 1,
 				'model' => 'Posts',
 				'user_id' => 1,
+				'value' => null,
 				'created' => '2024-03-13 02:01:23',
 			],
 		];
