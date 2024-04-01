@@ -73,6 +73,23 @@ class FavoritesTableTest extends TestCase {
 	/**
 	 * @return void
 	 */
+	public function testAddValue(): void {
+		$favorites = $this->Favorites->find()->all()->toArray();
+		$this->assertCount(1, $favorites);
+
+		$result = $this->Favorites->add('Posts', 1, 1, 1);
+		$this->assertSame(1, $result->value);
+
+		$result = $this->Favorites->add('Posts', 1, 1, -1);
+		$this->assertSame(-1, $result->value);
+
+		$favorites = $this->Favorites->find()->all()->toArray();
+		$this->assertCount(1, $favorites);
+	}
+
+	/**
+	 * @return void
+	 */
 	public function testRemove(): void {
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(1, $favorites);

@@ -3,11 +3,16 @@
 ## Types
 There are different types:
 
-- **Favorite**: Binary (set=yes, unset=no) on a record, so either favorite or not. Basically a "like" without being able to "dislike".
+- **Star**: Binary (set=yes, unset=no) on a record, so either favorite or not. Basically a "like" without being able to "dislike".
+  - `StarableBehavior` without any values and `addStar()`/`removeStar()`
+- **Like**: Boolean behavior of voting thumbs up/down for "like" vs "dislike".
+  - `LikeableBehavior` without any values and `addLike()`/`addDislike()`/`removeLikeOrDislike()`
 
 TODO:
-- **Like**: Boolean behavior of voting thumbs up/down for "like" vs "dislike".
-- **Custom**: Enum like list of possible values between int(-128...128) mapped to a map of `int|string` values or PHP enum and its values.
+- **Custom**: Enum like list of freely defined values between int(-128...128) mapped to a map of `int|string` values or PHP enum and its values.
+    - `FavoriteableBehavior` with custom values and `addFavorite()`/`removeFavorite()` as well as defined `values` config.
+
+Star type has a counter-cache option built-in (default false).
 
 ## Strategies
 

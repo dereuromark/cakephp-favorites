@@ -9,7 +9,7 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
 
-class FavorableBehavior extends Behavior {
+class LikeableBehavior extends Behavior {
 
 	/**
 	 * Default settings
@@ -19,15 +19,13 @@ class FavorableBehavior extends Behavior {
 	protected array $_defaultConfig = [
 		'modelClass' => null, // Auto-detect
 		'favoriteClass' => 'Favorites.Favorites',
-		'userModelAlias' => 'Users',
 		'userModelClass' => 'Users',
-		'userModel' => null,
+		'userModelConfig' => null,
 		'countFavorites' => false,
 		'implementedFinders' => [
-			'favorites' => 'findFavorites',
-			'favoritesBy' => 'findFavoritesBy',
+			'liked' => 'findLiked',
+			'LikedBy' => 'findLikedBy',
 		],
-		'fieldCounter' => 'favorites_count', //TODO
 	];
 
 	/**
@@ -52,8 +50,15 @@ class FavorableBehavior extends Behavior {
 	 * @return void
 	 */
 	public function initialize(array $config): void {
+		if (!$this->getConfig('model')) {
+			$this->setConfig('model', $this->_table->getAlias());
+		}
 		if (!$this->getConfig('modelClass')) {
-			$this->setConfig('modelClass', $this->_table->getAlias());
+			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
+		}
+		if (!$this->getConfig('userModel')) {
+			[, $alias] = pluginSplit($this->getConfig('userModelClass'));
+			$this->setConfig('userModel', $alias);
 		}
 
 		$this->_table->hasMany('Favorites', [
@@ -64,26 +69,19 @@ class FavorableBehavior extends Behavior {
 			'dependent' => true,
 		]);
 
-		if ($this->getConfig('countFavorites')) {
-			$this->favoritesTable()->addBehavior('CounterCache', [
-				$this->_table->getAlias() => [$this->getConfig('fieldCounter')],
-			]);
-		}
-
-		$this->favoritesTable()->belongsTo($this->getConfig('modelClass'), [
+		$this->favoritesTable()->belongsTo($this->getConfig('model'), [
 			'className' => $this->getConfig('modelClass'),
 			'foreignKey' => 'foreign_key',
 		]);
 
-		if (!empty($config['userModel']) && is_array($config['userModel'])) {
-			$this->favoritesTable()->belongsTo($config['userModelAlias'], $config['userModel']);
+		if (!empty($config['userModelConfig']) && is_array($config['userModelConfig'])) {
+			$this->favoritesTable()->belongsTo($config['userModel'], $config['userModelConfig']);
 		} else {
 			$userConfig = [
 				'className' => $this->getConfig('userModelClass'),
 				'foreignKey' => 'user_id',
-				//'counterCache' => true,
 			];
-			$this->favoritesTable()->belongsTo($this->getConfig('userModelClass'), $userConfig);
+			$this->favoritesTable()->belongsTo($this->getConfig('userModel'), $userConfig);
 		}
 	}
 
@@ -96,8 +94,28 @@ class FavorableBehavior extends Behavior {
 	 *
 	 * @return int|null
 	 */
-	public function addFavorite(array $options = []) {
-		$options += ['value' => null, 'model' => null, 'modelId' => null, 'userId' => null];
+	public function addLike(array $options = []) {
+		$options += ['value' => 1, 'model' => $this->getConfig('model'), 'modelId' => null, 'userId' => null];
+
+		$favorite = $this->favoritesTable()->add($options['model'], $options['modelId'], $options['userId'], $options['value']);
+		if (!$favorite->isNew()) {
+			return $favorite->id;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handle adding favorites
+	 *
+	 * @param array $options extra information and favorite statistics
+	 *
+	 * @throws \Cake\Http\Exception\MethodNotAllowedException
+	 *
+	 * @return int|null
+	 */
+	public function addDislike(array $options = []) {
+		$options += ['value' => -1, 'model' => $this->getConfig('model'), 'modelId' => null, 'userId' => null];
 
 		$favorite = $this->favoritesTable()->add($options['model'], $options['modelId'], $options['userId'], $options['value']);
 		if (!$favorite->isNew()) {
@@ -115,7 +133,7 @@ class FavorableBehavior extends Behavior {
 	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
-	public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
+	public function findLiked(SelectQuery $query, array $options = []): SelectQuery {
 		return $query->contain([
 			'Favorites' => function (Query $q) use ($options) {
 				$q->contain('Users');

@@ -235,7 +235,7 @@ class FavoriteComponent extends Component {
 		$this->viewVariable = Inflector::variable($entityName);
 		//$this->Controller->helpers = array_merge($this->Controller->helpers, ['Favorites.FavoriteWidget', 'Time', 'Favorites.Cleaner', 'Favorites.Tree']);
 		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Favoriteable')) {
-			$this->Controller->{$this->modelAlias}->behaviors()->attach('Favorites.Favoriteable', ['userModelAlias' => $this->userModel, 'userModelClass' => $this->userModelClass]);
+			$this->Controller->{$this->modelAlias}->behaviors()->attach('Favorites.Favoriteable', ['userModel' => $this->userModel, 'userModelClass' => $this->userModelClass]);
 		}
 
 		/*
