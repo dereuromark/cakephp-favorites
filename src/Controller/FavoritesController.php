@@ -64,7 +64,7 @@ class FavoritesController extends AppController {
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid, $value);
-		if (!$result->isNew()) {
+		if ($result->isNew()) {
 			$this->Flash->error(__d('favorites', 'Could not save favorite, please try again.'));
 		}
 

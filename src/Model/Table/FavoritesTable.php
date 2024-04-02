@@ -119,4 +119,13 @@ class FavoritesTable extends Table {
 		return $this->deleteAll($data);
 	}
 
+	/**
+	 * @param string $model
+	 *
+	 * @return int
+	 */
+	public function reset(string $model): int {
+		return $this->deleteAll(['model' => $model]);
+	}
+
 }

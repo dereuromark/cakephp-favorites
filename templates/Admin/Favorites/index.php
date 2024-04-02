@@ -18,7 +18,7 @@
     <ul>
 		<?php foreach ($models as $model => $count): ?>
 		<li>
-			<?php echo h($model); ?>: <?php echo $count; ?>x
+			<?php echo h($model); ?>: <?php echo $count; ?>x <?php echo $this->Form->postLink('Reset', ['?' => ['model' => $model]], ['confirm' => 'Sure?']); ?>
 		</li>
 		<?php endforeach; ?>
 	</ul>

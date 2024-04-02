@@ -23,6 +23,7 @@
                     <th><?= $this->Paginator->sort('model') ?></th>
                     <th><?= $this->Paginator->sort('foreign_key') ?></th>
                     <th><?= $this->Paginator->sort('user_id') ?></th>
+					<th><?= __('Value') ?></th>
                     <th><?= $this->Paginator->sort('created', null, ['direction' => 'desc']) ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
@@ -31,8 +32,11 @@
                 <?php foreach ($favorites as $comment): ?>
                 <tr>
                     <td><?= h($comment->model) ?></td>
-                    <td><?= $this->Number->format($comment->foreign_key) ?></td>
+                    <td><?= h($comment->foreign_key) ?></td>
                     <td><?= $comment->hasValue('user') ? $this->Html->link($comment->user->username, ['controller' => 'Users', 'action' => 'view', $comment->user->id]) : '' ?></td>
+					<td>
+						<?php echo h($comment->value ?? '-'); ?>
+					</td>
                     <td><?= $this->Time->nice($comment->created) ?></td>
                     <td class="actions">
                         <?php

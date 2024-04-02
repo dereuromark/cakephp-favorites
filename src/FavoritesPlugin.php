@@ -42,7 +42,6 @@ class FavoritesPlugin extends BasePlugin {
 	public function routes(RouteBuilder $routes): void {
 		$routes->plugin(
 			'Favorites',
-			['path' => '/favorites'],
 			function (RouteBuilder $builder) {
 				$builder->fallbacks();
 			},
@@ -51,7 +50,6 @@ class FavoritesPlugin extends BasePlugin {
 		$routes->prefix('Admin', function (RouteBuilder $builder) {
 			$builder->plugin(
 				'Favorites',
-				['path' => '/favorites'],
 				function (RouteBuilder $builder) {
 					$builder->connect('/', ['controller' => 'Favorites', 'action' => 'index']);
 

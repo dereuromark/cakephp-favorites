@@ -54,8 +54,8 @@ class StarsController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to add star');
 		}
 
-		$result = $this->Favorites->add($model, $entity->get('id'), $uid, 1);
-		if (!$result->isNew()) {
+		$result = $this->Favorites->add($model, $entity->get('id'), $uid);
+		if ($result->isNew()) {
 			$this->Flash->error(__d('favorites', 'Could not save like, please try again.'));
 		}
 

@@ -15,6 +15,14 @@ class FavoritesController extends AppController {
 	 * @return \Cake\Http\Response|null|void Renders view
 	 */
 	public function index() {
+		if ($this->request->is(['post', 'put'])) {
+			$model = $this->request->getQuery('model');
+			$count = $this->Favorites->reset($model);
+			$this->Flash->success(__('The favorites have been reset for `' . $model . '`, deleted: ' . $count . '.'));
+
+			return $this->redirect(['action' => 'index']);
+		}
+
 		$models = $this->Favorites->find()
 			->select(['model', 'count' => $this->Favorites->find()->func()->count('*')])
 			->where(['model IS NOT' => null])

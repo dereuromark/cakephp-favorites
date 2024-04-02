@@ -7,9 +7,11 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
+use Cake\Routing\Router;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use Favorites\FavoritesPlugin;
 use TestApp\Controller\AppController;
+use TestApp\View\AppView;
 
 if (!defined('DS')) {
 	define('DS', DIRECTORY_SEPARATOR);
@@ -79,6 +81,7 @@ $cache = [
 Cache::setConfig($cache);
 
 class_alias(AppController::class, 'App\Controller\AppController');
+class_alias(AppView::class, 'App\View\AppView');
 
 Configure::write('App', [
 	'namespace' => 'TestApp',
@@ -92,6 +95,7 @@ Configure::write('App', [
 
 Plugin::getCollection()->add(new FavoritesPlugin());
 
+Router::defaultRouteClass(\Cake\Routing\Route\DashedRoute::class);
 Chronos::setTestNow(Chronos::now());
 
 if (!getenv('DB_URL')) {

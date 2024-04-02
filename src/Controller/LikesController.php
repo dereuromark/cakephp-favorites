@@ -55,7 +55,7 @@ class LikesController extends AppController {
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid, 1);
-		if (!$result->isNew()) {
+		if ($result->isNew()) {
 			$this->Flash->error(__d('favorites', 'Could not save like, please try again.'));
 		}
 

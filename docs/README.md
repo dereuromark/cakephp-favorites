@@ -7,7 +7,7 @@ There are different types:
   - `StarableBehavior` without any values and `addStar()`/`removeStar()`
 - **Like**: Boolean behavior of voting thumbs up/down for "like" vs "dislike".
   - `LikeableBehavior` without any values and `addLike()`/`addDislike()`/`removeLikeOrDislike()`
-- **Custom**: Enum like list of freely defined values between int(-128...128) mapped to a map of `int|string` values or PHP enum and its values.
+- **Favorite**: Enum like list of freely defined values between int(-128...128) mapped to a map of `int|string` values or PHP enum and its values.
     - `FavoriteableBehavior` with custom values and `addFavorite()`/`removeFavorite()` as well as defined `values` config.
 
 Star type has a counter-cache option built-in (default false).
@@ -51,7 +51,15 @@ Also specify a whitelist of models that can be used here in your app config:
 
 This can be needed, if you want to display a validation result on the form itself for invalidation.
 
+
+## Detailed Docs
+- [Star](Star.md)
+- [Like](Like.md)
+- [Favorite](Favorite.md)
+
 ## Admin Backend
 Go to `/admin/favorites`.
 
 Make sure you set up ACL to only have admins access this part.
+
+Here you can also reset per model type.
