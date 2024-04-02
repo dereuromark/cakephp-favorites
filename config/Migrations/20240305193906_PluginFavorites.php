@@ -61,9 +61,10 @@ class PluginFavorites extends AbstractMigration {
 					'model',
 					'foreign_key',
 					'user_id',
+					'value',
 				],
 				[
-					'name' => 'per_user',
+					'name' => 'unique',
 					'unique' => true,
 				],
 			)

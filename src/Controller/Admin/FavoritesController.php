@@ -15,6 +15,20 @@ class FavoritesController extends AppController {
 	 * @return \Cake\Http\Response|null|void Renders view
 	 */
 	public function index() {
+		$models = $this->Favorites->find()
+			->select(['model', 'count' => $this->Favorites->find()->func()->count('*')])
+			->where(['model IS NOT' => null])
+			->groupBy('model')
+			->find('list', ['keyField' => 'model', 'valueField' => 'count'])
+			->toArray();
+
+		$this->set(compact('models'));
+	}
+
+	/**
+	 * @return \Cake\Http\Response|null|void Renders view
+	 */
+	public function listing() {
 		$query = $this->Favorites->find()
 			->contain(['Users']);
 		$favorites = $this->paginate($query);

@@ -6,6 +6,7 @@ use App\Controller\AppController;
 use Cake\Core\Configure;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
+use InvalidArgumentException;
 use TinyAuth\Controller\Component\AuthComponent;
 use TinyAuth\Controller\Component\AuthUserComponent;
 
@@ -16,7 +17,9 @@ use TinyAuth\Controller\Component\AuthUserComponent;
  */
 class FavoritesController extends AppController {
 
-	protected ?string $modelClass = 'Favorites.Favorites';
+	use AuthTrait;
+
+	protected ?string $defaultTable = 'Favorites.Favorites';
 
 	/**
 	 * @return void
@@ -56,8 +59,8 @@ class FavoritesController extends AppController {
 		if ($value !== null) {
 			$value = (int)$value;
 		}
-		if ($value === 0) {
-			$value = null;
+		if (!$value) {
+			throw new InvalidArgumentException('Missing value for Favorite ' . $alias . ':' . $id);
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid, $value);
@@ -92,21 +95,6 @@ class FavoritesController extends AppController {
 		$this->Favorites->remove($model, $entity->get('id'), $uid);
 
 		return $this->redirect($this->referer(['action' => 'index']));
-	}
-
-	/**
-	 * @return int|null
-	 */
-	protected function userId() {
-		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
-		if ($this->components()->has('AuthUser')) {
-			return $this->AuthUser->user($userIdField);
-		}
-		if ($this->components()->has('Auth')) {
-			return $this->Auth->user('id');
-		}
-
-		return $this->getRequest()->getSession()->read('Auth.User.' . $userIdField);
 	}
 
 	/**

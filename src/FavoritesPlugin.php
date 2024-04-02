@@ -53,6 +53,8 @@ class FavoritesPlugin extends BasePlugin {
 				'Favorites',
 				['path' => '/favorites'],
 				function (RouteBuilder $builder) {
+					$builder->connect('/', ['controller' => 'Favorites', 'action' => 'index']);
+
 					$builder->fallbacks();
 				},
 			);

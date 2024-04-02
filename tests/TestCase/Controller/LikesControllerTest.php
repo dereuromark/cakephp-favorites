@@ -8,11 +8,11 @@ use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
- * Favorites\Controller\FavoritesController Test Case
+ * Favorites\Controller\LikesController Test Case
  *
- * @uses \Favorites\Controller\FavoritesController
+ * @uses \Favorites\Controller\LikesController
  */
-class FavoritesControllerTest extends TestCase {
+class LikesControllerTest extends TestCase {
 
 	use IntegrationTestTrait;
 
@@ -30,11 +30,11 @@ class FavoritesControllerTest extends TestCase {
 	/**
 	 * Test add method
 	 *
-	 * @uses \Favorites\Controller\FavoritesController::add()
+	 * @uses \Favorites\Controller\LikesController::like()
 	 *
 	 * @return void
 	 */
-	public function testAdd(): void {
+	public function testLike(): void {
 		$this->disableErrorHandlerMiddleware();
 
 		Configure::write('Favorites.controllerModels.Posts', 'Posts');
@@ -47,7 +47,7 @@ class FavoritesControllerTest extends TestCase {
 			],
 		]);
 
-		$this->post(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'add', 'Posts', 1], ['value' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Posts', 1]);
 
 		$this->assertRedirect(['action' => 'index']);
 
@@ -55,7 +55,34 @@ class FavoritesControllerTest extends TestCase {
 	}
 
 	/**
-	 * @uses \Favorites\Controller\FavoritesController::remove()
+	 * Test add method
+	 *
+	 * @uses \Favorites\Controller\LikesController::dislike()
+	 *
+	 * @return void
+	 */
+	public function testDislike(): void {
+		$this->disableErrorHandlerMiddleware();
+
+		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+
+		$this->session([
+			'Auth' => [
+				'User' => [
+					'id' => 1,
+				],
+			],
+		]);
+
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'dislike', 'Posts', 1]);
+
+		$this->assertRedirect(['action' => 'index']);
+
+		Configure::delete('Favorites.controllerModels');
+	}
+
+	/**
+	 * @uses \Favorites\Controller\LikesController::remove()
 	 *
 	 * @return void
 	 */
@@ -72,7 +99,7 @@ class FavoritesControllerTest extends TestCase {
 			],
 		]);
 
-		$this->delete(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'remove', 'Posts', $favorite->id]);
+		$this->delete(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'remove', 'Posts', $favorite->id]);
 
 		$this->assertRedirect(['action' => 'index']);
 
@@ -80,7 +107,7 @@ class FavoritesControllerTest extends TestCase {
 	}
 
 	/**
-	 * @uses \Favorites\Controller\FavoritesController::delete()
+	 * @uses \Favorites\Controller\LikesController::delete()
 	 *
 	 * @return void
 	 */
@@ -95,7 +122,7 @@ class FavoritesControllerTest extends TestCase {
 			],
 		]);
 
-		$this->delete(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'delete', $favorite->id]);
+		$this->delete(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'delete', $favorite->id]);
 
 		$this->assertRedirect(['action' => 'index']);
 	}

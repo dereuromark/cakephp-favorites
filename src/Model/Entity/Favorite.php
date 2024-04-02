@@ -8,10 +8,10 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string $model
  * @property int $foreign_key
- * @property int|null $user_id
+ * @property int $user_id
  * @property int|null $value
  * @property \Cake\I18n\DateTime $created
- * @property \App\Model\Entity\User|null $user
+ * @property \App\Model\Entity\User $user
  */
 class Favorite extends Entity {
 

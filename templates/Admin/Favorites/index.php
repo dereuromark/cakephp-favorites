@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \App\View\AppView $this
- * @var iterable<\Favorites\Model\Entity\Favorite> $favorites
+ * @var array<string, int> $models
  */
 ?>
 <nav class="actions large-3 medium-4 columns col-sm-4 col-xs-12" id="actions-sidebar">
@@ -15,38 +15,14 @@
 
     <h2><?= __('Favorites') ?></h2>
 
-    <div class="">
-        <table class="table table-sm table-striped">
-            <thead>
-                <tr>
-                    <th><?= $this->Paginator->sort('model') ?></th>
-                    <th><?= $this->Paginator->sort('foreign_key') ?></th>
-                    <th><?= $this->Paginator->sort('user_id') ?></th>
-                    <th><?= $this->Paginator->sort('created', null, ['direction' => 'desc']) ?></th>
-                    <th class="actions"><?= __('Actions') ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($favorites as $comment): ?>
-                <tr>
-                    <td><?= h($comment->model) ?></td>
-                    <td><?= $this->Number->format($comment->foreign_key) ?></td>
-                    <td><?= $comment->hasValue('user') ? $this->Html->link($comment->user->username, ['controller' => 'Users', 'action' => 'view', $comment->user->id]) : '' ?></td>
-                    <td><?= $this->Time->nice($comment->created) ?></td>
-                    <td class="actions">
-                        <?php
-						$label = __('Delete');
-						if ($this->helpers()->has('Icon')) {
-							$label = $this->Icon->render('delete');
-						}
-						echo $this->Form->postLink($label, ['action' => 'delete', $comment->id], ['escapeTitle' => false, 'confirm' => __('Are you sure you want to delete # {0}?', $comment->id)]);
-						?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+    <ul>
+		<?php foreach ($models as $model => $count): ?>
+		<li>
+			<?php echo h($model); ?>: <?php echo $count; ?>x
+		</li>
+		<?php endforeach; ?>
+	</ul>
 
-    <?php echo $this->element('Favorites.pagination'); ?>
+	<p><?= $this->Html->link(__('Details'), ['action' => 'listing'], ['class' => '']) ?></p>
+
 </div>

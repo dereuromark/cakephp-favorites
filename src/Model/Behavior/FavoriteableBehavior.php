@@ -25,6 +25,7 @@ class FavoriteableBehavior extends Behavior {
 			'favorites' => 'findFavorites',
 			'favoritesBy' => 'findFavoritesBy',
 		],
+		'multiple' => false, //TODO
 	];
 
 	/**
@@ -100,7 +101,7 @@ class FavoriteableBehavior extends Behavior {
 	 * @return int|null
 	 */
 	public function addFavorite(array $options = []) {
-		$options += ['value' => null, 'model' => null, 'modelId' => null, 'userId' => null];
+		$options += ['value' => null, 'model' => $this->getConfig('model'), 'modelId' => null, 'userId' => null];
 
 		$favorite = $this->favoritesTable()->add($options['model'], $options['modelId'], $options['userId'], $options['value']);
 		if (!$favorite->isNew()) {
@@ -119,8 +120,8 @@ class FavoriteableBehavior extends Behavior {
 	 *
 	 * @return int
 	 */
-	public function removeLikeOrDislike(array $options = []): int {
-		$options += ['model' => null, 'modelId' => null, 'userId' => null];
+	public function removeFavorite(array $options = []): int {
+		$options += ['model' => $this->getConfig('model'), 'modelId' => null, 'userId' => null];
 
 		return $this->favoritesTable()->remove($options['model'], $options['modelId'], $options['userId']);
 	}

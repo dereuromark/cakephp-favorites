@@ -40,6 +40,25 @@ class FavoritesControllerTest extends TestCase {
 	}
 
 	/**
+	 * @uses \Favorites\Controller\Admin\FavoritesController::listing()
+	 *
+	 * @return void
+	 */
+	public function testListing(): void {
+		$this->session([
+			'Auth' => [
+				'User' => [
+					'id' => 1,
+				],
+			],
+		]);
+
+		$this->get(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'listing']);
+
+		$this->assertResponseOk();
+	}
+
+	/**
 	 * @uses \Favorites\Controller\Admin\FavoritesController::delete()
 	 *
 	 * @return void

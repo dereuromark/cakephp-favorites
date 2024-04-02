@@ -103,7 +103,7 @@ class StarableBehavior extends Behavior {
 	 * @return int|null
 	 */
 	public function addStar(array $options = []) {
-		$options += ['model' => null, 'modelId' => null, 'userId' => null];
+		$options += ['model' => $this->getConfig('model'), 'modelId' => null, 'userId' => null];
 
 		$favorite = $this->favoritesTable()->add($options['model'], $options['modelId'], $options['userId']);
 		if (!$favorite->isNew()) {
@@ -123,7 +123,7 @@ class StarableBehavior extends Behavior {
 	 * @return int
 	 */
 	public function removeStar(array $options = []): int {
-		$options += ['model' => null, 'modelId' => null, 'userId' => null];
+		$options += ['model' => $this->getConfig('model'), 'modelId' => null, 'userId' => null];
 
 		return $this->favoritesTable()->remove($options['model'], $options['modelId'], $options['userId']);
 	}

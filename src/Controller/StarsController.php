@@ -14,7 +14,7 @@ use TinyAuth\Controller\Component\AuthUserComponent;
  * @property \TinyAuth\Controller\Component\AuthUserComponent $AuthUser
  * @property \TinyAuth\Controller\Component\AuthComponent $Auth
  */
-class LikesController extends AppController {
+class StarsController extends AppController {
 
 	use AuthTrait;
 
@@ -39,7 +39,7 @@ class LikesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function like($alias = null, $id = null) {
+	public function star($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
 		$model = Configure::read('Favorites.controllerModels.' . $alias);
@@ -51,7 +51,7 @@ class LikesController extends AppController {
 
 		$uid = $this->userId();
 		if (!$uid) {
-			throw new MethodNotAllowedException('Must be logged in to add like');
+			throw new MethodNotAllowedException('Must be logged in to add star');
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid, 1);
@@ -68,36 +68,7 @@ class LikesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function dislike($alias = null, $id = null) {
-		$this->request->allowMethod(['post', 'put', 'patch']);
-
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
-		if (!$model) {
-			throw new NotFoundException('Invalid alias');
-		}
-		$table = $this->fetchTable($model);
-		$entity = $table->get($id);
-
-		$uid = $this->userId();
-		if (!$uid) {
-			throw new MethodNotAllowedException('Must be logged in to add dislike');
-		}
-
-		$result = $this->Favorites->add($model, $entity->get('id'), $uid, -1);
-		if (!$result->isNew()) {
-			$this->Flash->error(__d('favorites', 'Could not save dislike, please try again.'));
-		}
-
-		return $this->redirect($this->referer(['action' => 'index']));
-	}
-
-	/**
-	 * @param string|null $alias
-	 * @param int|null $id
-	 *
-	 * @return \Cake\Http\Response|null
-	 */
-	public function remove($alias = null, $id = null) {
+	public function unstar($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$model = Configure::read('Favorites.controllerModels.' . $alias);
@@ -109,7 +80,7 @@ class LikesController extends AppController {
 
 		$uid = $this->userId();
 		if (!$uid) {
-			throw new MethodNotAllowedException('Must be logged in to remove like/dislike');
+			throw new MethodNotAllowedException('Must be logged in to remove star');
 		}
 
 		$this->Favorites->remove($model, $entity->get('id'), $uid);
