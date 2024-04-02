@@ -7,8 +7,6 @@ There are different types:
   - `StarableBehavior` without any values and `addStar()`/`removeStar()`
 - **Like**: Boolean behavior of voting thumbs up/down for "like" vs "dislike".
   - `LikeableBehavior` without any values and `addLike()`/`addDislike()`/`removeLikeOrDislike()`
-
-TODO:
 - **Custom**: Enum like list of freely defined values between int(-128...128) mapped to a map of `int|string` values or PHP enum and its values.
     - `FavoriteableBehavior` with custom values and `addFavorite()`/`removeFavorite()` as well as defined `values` config.
 
@@ -31,6 +29,23 @@ Preferred way is posting to the specific controllers using AJAX with PRG fallbac
 It has less change of colliding with a different form on that action.
 
 Make sure to set ACL for this controller as only logged in people are allowed to use this.
+
+Also specify a whitelist of models that can be used here in your app config:
+```php
+'Favorites' => [
+    'controllerModels' => [
+        'star' => [
+            'Alias' => 'MyPlugin.MyModel',
+        ],
+        'like' => [
+            'MyPosts' => 'Posts',
+        ],
+        'favorite' => [
+            ...
+        ],
+    ],
+],
+```
 
 ### Action
 

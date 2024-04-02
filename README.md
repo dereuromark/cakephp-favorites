@@ -10,8 +10,6 @@
 
 Favorites plugin for CakePHP applications.
 
-NOte: THIS IS A **WIP** PLUGIN - Please help to finish it up.
-
 This branch is for use with **CakePHP 5.0+**. For details see [version map](https://github.com/dereuromark/cakephp-favorites/wiki#cakephp-version-map).
 
 ## Motivation
@@ -38,9 +36,13 @@ There are many implementations in modern applications:
 - Reddit Votes
 - Medium Claps
 
-This package so far mainly supports basic and binary favorite per entry.
+This package so far mainly supports basic and binary favorite per entry in 3 different types:
+- **star** (yes/no)
+- **like** (upvote/downvote/none)
+- **favorite** (custom enum list)
+
 But it could be developed in mind that it should cover all the possible use cases and
-be viable in enterprise applications.
+be viable in enterprise applications including multiple reactions per entity.
 Help is appreciated.
 
 A "counter-cache" field can be put on the starred record itself, to more easily count the

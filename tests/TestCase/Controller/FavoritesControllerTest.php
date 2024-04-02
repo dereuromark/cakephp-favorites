@@ -47,7 +47,7 @@ class FavoritesControllerTest extends TestCase {
 			],
 		]);
 
-		$this->post(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'add', 'Posts', 1], ['value' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'add', 'Posts', 1], ['value' => '1']);
 
 		$this->assertRedirect(['action' => 'index']);
 
