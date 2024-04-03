@@ -199,7 +199,11 @@ class StarableComponent extends Component {
 		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
 		$this->viewVariable = $this->getConfig('viewVariable') ?? Inflector::variable($entityName);
 		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Starable')) {
-			$this->Controller->{$this->modelAlias}->behaviors()->load('Favorites.Starable', ['userModel' => $this->getConfig('userModel'), $this->getConfig('userModelClass')]);
+			$config = [
+				'userModelClass' => $this->getConfig('userModelClass'),
+				'userId' => $this->userId(),
+			];
+			$this->Controller->{$this->modelAlias}->behaviors()->load('Favorites.Starable', $config);
 		}
 	}
 

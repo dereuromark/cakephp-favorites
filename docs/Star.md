@@ -43,6 +43,11 @@ The processing here happens in the `beforeRender()` callback by default.
 If needed, you can set the callback to `startup()` or even `beforeFilter()` execution.
 In this case, you cannot use entities, and you must rely on the data being sent via form data (model, id, ...).
 
+Make sure to set the default table in your controller class here:
+```php
+protected ?string $defaultTable = 'Posts';
+```
+Then just load the component:
 ```php
 // in your controller initialize()
 $this->loadComponent('Favorites.Starable');
@@ -53,6 +58,23 @@ The component will
 - auto-add the corresponding behavior and load needed associations
 - will provide a hook for posted data to be stored and redirect back using PRG pattern
 
-For the time being you have to manually pass down the favorites data to the view or let the view helper fetch it.
+By default, you can contain the `Starred` relation to pass down the favorites data to the view
+```php
+// in your controller action
+... = $this->fetchTable('Sandbox.SandboxPosts')
+    ->find()
+	->contain(['Starred'])
+	...
+```
+and
+```php
+// in your template
+echo $this->Stars->linkIcon('Posts', $post->id, (bool)$post->starred);
+```
+
+Note that this only applies for logged-in users.
+If this is a public page, you need to conditionally add this contain statement as the relation would not exist here!
+
+You can also let the view helper fetch it on demand.
 On pages with multiple entities, letting the helper do a separate SQL query for each is not advised, though.
 For basic view pages this is fine.

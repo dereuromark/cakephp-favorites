@@ -67,9 +67,18 @@ class StarableBehavior extends Behavior {
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
-			'conditions' => ['Favorites.model' => "{$this->_table->getAlias()}"],
+			'conditions' => ['Favorites.model' => $this->getConfig('model')],
 			'dependent' => true,
 		]);
+
+		if (!empty($config['userId'])) {
+			$this->_table->hasOne('Starred', [
+				'className' => $this->getConfig('favoriteClass'),
+				'foreignKey' => 'foreign_key',
+				'conditions' => ['Starred.model' => $this->getConfig('model'), 'Starred.user_id' => $config['userId']],
+				'dependent' => true,
+			]);
+		}
 
 		if ($this->getConfig('counterCache')) {
 			$this->favoritesTable()->addBehavior('CounterCache', [
@@ -90,9 +99,7 @@ class StarableBehavior extends Behavior {
 				'foreignKey' => 'user_id',
 				//'counterCache' => true,
 			];
-			$x = $this->getConfig('userModel');
-			$this->favoritesTable()->belongsTo($this->getConfig('userModel'), $userConfig);
-			//dd($this->favoritesTable()->$x->getTarget()->find()->all()->toArray());
+			$this->favoritesTable()->hasOne($this->getConfig('userModel'), $userConfig);
 		}
 	}
 

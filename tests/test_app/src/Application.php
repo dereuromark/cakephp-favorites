@@ -22,6 +22,8 @@ class Application extends BaseApplication {
 	 * @return void
 	 */
 	public function routes(RouteBuilder $routes): void {
+		$routes->fallbacks();
+
 		$routes->plugin(
 			'Favorites',
 			['path' => '/favorites'],
