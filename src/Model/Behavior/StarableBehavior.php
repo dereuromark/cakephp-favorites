@@ -4,7 +4,6 @@ namespace Favorites\Model\Behavior;
 
 use Cake\Core\Configure;
 use Cake\ORM\Behavior;
-use Cake\ORM\Query;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
@@ -130,36 +129,27 @@ class StarableBehavior extends Behavior {
 
 	/**
 	 * @param \Cake\ORM\Query\SelectQuery $query
-	 * @param array<string, mixed> $options
 	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
-	public function findStarred(SelectQuery $query, array $options = []): SelectQuery {
-		return $query->contain([
-			'Favorites' => function (Query $q) use ($options) {
-				$q->contain('Users');
-				$q->where(['foreign_key' => $options['id']]);
+	public function findStarred(SelectQuery $query): SelectQuery {
+		$subQuery = $this->buildStarredQuerySnippet();
+		$modelAlias = $this->_table->getAlias();
 
-				return $q;
-			},
-		]);
+		return $query->where([$modelAlias . '.id IN' => $subQuery]);
 	}
 
 	/**
 	 * @param \Cake\ORM\Query\SelectQuery $query
-	 * @param array<string, mixed> $options
+	 * @param int $userId
 	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
-	public function findStarredBy(SelectQuery $query, array $options = []): SelectQuery {
-		return $query->contain([
-			'Favorites' => function (Query $q) use ($options) {
-				$q->contain('Users');
-				$q->where(['foreign_key' => $options['id'], ['user_id' => $options['userId']]]);
+	public function findStarredBy(SelectQuery $query, int $userId): SelectQuery {
+		$subQuery = $this->buildStarredByQuerySnippet($userId);
+		$modelAlias = $this->_table->getAlias();
 
-				return $q;
-			},
-		]);
+		return $query->where([$modelAlias . '.id IN' => $subQuery]);
 	}
 
 	/**
@@ -168,6 +158,37 @@ class StarableBehavior extends Behavior {
 	protected function favoritesTable(): FavoritesTable {
 		/** @var \Favorites\Model\Table\FavoritesTable */
 		return $this->_table->Favorites->getTarget();
+	}
+
+	/**
+	 * @return \Cake\ORM\Query\SelectQuery
+	 */
+	protected function buildStarredQuerySnippet(): SelectQuery {
+		$model = $this->getConfig('model');
+		$conditions = [
+			$this->favoritesTable()->getAlias() . '.model' => $model,
+		];
+
+		return $this->favoritesTable()->find()
+			->select($this->favoritesTable()->getAlias() . '.foreign_key')
+			->where($conditions);
+	}
+
+	/**
+	 * @param int $userId
+	 *
+	 * @return \Cake\ORM\Query\SelectQuery
+	 */
+	protected function buildStarredByQuerySnippet(int $userId): SelectQuery {
+		$model = $this->getConfig('model');
+		$conditions = [
+			$this->favoritesTable()->getAlias() . '.model' => $model,
+			$this->favoritesTable()->getAlias() . '.user_id' => $userId,
+		];
+
+		return $this->favoritesTable()->find()
+			->select($this->favoritesTable()->getAlias() . '.foreign_key')
+			->where($conditions);
 	}
 
 }

@@ -4,7 +4,6 @@ namespace Favorites\Model\Behavior;
 
 use Cake\Core\Configure;
 use Cake\ORM\Behavior;
-use Cake\ORM\Query;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
@@ -129,19 +128,28 @@ class LikeableBehavior extends Behavior {
 	 * Create the finder favorites
 	 *
 	 * @param \Cake\ORM\Query\SelectQuery $query
-	 * @param array<string, mixed> $options
 	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
-	public function findLiked(SelectQuery $query, array $options = []): SelectQuery {
-		return $query->contain([
-			'Favorites' => function (Query $q) use ($options) {
-				$q->contain('Users');
-				$q->where(['foreign_key' => $options['id']]);
+	public function findLiked(SelectQuery $query): SelectQuery {
+		$subQuery = $this->buildLikedQuerySnippet(1);
+		$modelAlias = $this->_table->getAlias();
 
-				return $q;
-			},
-		]);
+		return $query->where([$modelAlias . '.id IN' => $subQuery]);
+	}
+
+	/**
+	 * Create the finder favorites
+	 *
+	 * @param \Cake\ORM\Query\SelectQuery $query
+	 *
+	 * @return \Cake\ORM\Query\SelectQuery
+	 */
+	public function findDisliked(SelectQuery $query): SelectQuery {
+		$subQuery = $this->buildLikedQuerySnippet(-1);
+		$modelAlias = $this->_table->getAlias();
+
+		return $query->where([$modelAlias . '.id IN' => $subQuery]);
 	}
 
 	/**
@@ -150,6 +158,23 @@ class LikeableBehavior extends Behavior {
 	protected function favoritesTable(): FavoritesTable {
 		/** @var \Favorites\Model\Table\FavoritesTable */
 		return $this->_table->Favorites->getTarget();
+	}
+
+	/**
+	 * @param int $value
+	 *
+	 * @return \Cake\ORM\Query\SelectQuery
+	 */
+	protected function buildLikedQuerySnippet(int $value): SelectQuery {
+		$model = $this->getConfig('model');
+		$conditions = [
+			$this->favoritesTable()->getAlias() . '.model' => $model,
+			$this->favoritesTable()->getAlias() . '.value' => $value,
+		];
+
+		return $this->favoritesTable()->find()
+			->select($this->favoritesTable()->getAlias() . '.foreign_key')
+			->where($conditions);
 	}
 
 }
