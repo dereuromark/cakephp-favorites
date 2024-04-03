@@ -13,12 +13,13 @@ trait AuthTrait {
 	 * @return int|null
 	 */
 	protected function userId(): ?int {
-		$uid = Configure::read('Auth.User.id');
+		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
+
+		$uid = Configure::read('Auth.User.' . $userIdField);
 		if ($uid) {
 			return $uid;
 		}
 
-		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
 		/** @var \App\View\AppView $view */
 		$view = $this->_View;
 		if ($view->helpers()->has('AuthUser')) {
