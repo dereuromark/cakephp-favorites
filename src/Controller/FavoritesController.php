@@ -43,7 +43,7 @@ class FavoritesController extends AppController {
 	public function add($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}
@@ -80,7 +80,7 @@ class FavoritesController extends AppController {
 	public function remove($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'delete']);
 
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}

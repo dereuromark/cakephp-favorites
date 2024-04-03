@@ -39,8 +39,10 @@ namespace Favorites\Controller\Component;
 
 use BadMethodCallException;
 use Cake\Controller\Component;
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\MethodNotAllowedException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\Utility\Inflector;
 use RuntimeException;
 
@@ -49,13 +51,17 @@ use RuntimeException;
  *
  * @method \App\Controller\AppController getController()
  */
-class FavoriteComponent extends Component {
+class StarableComponent extends Component {
 
 	/**
 	 * @var array<string, mixed>
 	 */
 	protected array $_defaultConfig = [
+		'callback' => 'beforeRender',
+		'userModelClass' => 'Users',
 		'userIdField' => 'id',
+		'useEntity' => false,
+		'viewVariable' => null,
 	];
 
 	/**
@@ -75,28 +81,13 @@ class FavoriteComponent extends Component {
 	protected $Controller;
 
 	/**
-	 * Name of actions this component should use
+	 * Name of 'favoriteable' model
 	 *
-	 * Customizable in beforeFilter()
+	 * Customizable in beforeFilter(), or default controller's model name is used
 	 *
-	 * @var array<string>
+	 * @var string|null Model name
 	 */
-	protected $actionNames = [
-		'view', 'favorites',
-	];
-
-	/**
-	 * Actions used for deleting of some model record, which doesn't use SoftDelete
-	 * (so we want favorites delete directly)
-	 *
-	 * Causes than Favorite association will NOT be automatically unbind()ed,
-	 * independently on $this->unbindAssoc
-	 *
-	 * Customizable in beforeFilter()
-	 *
-	 * @var array<string>
-	 */
-	protected $deleteActions = [];
+	protected $modelName;
 
 	/**
 	 * Name of 'favoriteable' model
@@ -115,25 +106,6 @@ class FavoriteComponent extends Component {
 	 * @var string Association name
 	 */
 	protected $assocName = 'Favorites';
-
-	/**
-	 * Name of user model associated to favorite
-	 *
-	 * Customizable in beforeFilter()
-	 *
-	 * @var string Name of the user model
-	 */
-	protected $userModel = 'Users';
-
-	/**
-	 * Class Name for user model in ClassRegistry format.
-	 * Ex: For User model stored in User plugin need to use Users.User
-	 *
-	 * Customizable in beforeFilter()
-	 *
-	 * @var string user model class name
-	 */
-	protected $userModelClass = 'Users';
 
 	/**
 	 * Flag if this component should permanently unbind association to Favorite model in order to not
@@ -189,26 +161,46 @@ class FavoriteComponent extends Component {
 	];
 
 	/**
-	 * Named params used internally by the component
-	 *
-	 * @var array
-	 */
-	protected array $_supportNamedParams = [
-		'favorite',
-		'favorite_action',
-		'favorite_view_type',
-		'quote',
-	];
-
-	/**
-	 * Initialize Callback
-	 *
 	 * @param array $config
 	 *
 	 * @return void
 	 */
 	public function initialize(array $config): void {
 		$this->Controller = $this->getController();
+
+		$config += (array)Configure::read('Favorites');
+		$this->setConfig($config);
+
+		if (!$this->getConfig('userModel')) {
+			[, $alias] = pluginSplit($this->getConfig('userModelClass'));
+			$this->setConfig('userModel', $alias);
+		}
+	}
+
+	/**
+	 * @param \Cake\Event\EventInterface $event
+	 *
+	 * @return \Cake\Http\Response|null|void
+	 */
+	public function beforeFilter(EventInterface $event) {
+		$actions = $this->getConfig('actions');
+		if ($actions) {
+			$action = $this->Controller->getRequest()->getParam('action') ?: '';
+			if (!in_array($action, $actions, true)) {
+				return null;
+			}
+		}
+
+		$model = $this->Controller->fetchTable();
+		$this->modelName = $model->getRegistryAlias();
+		$this->modelAlias = $model->getAlias();
+
+		$parts = explode('\\', $model->getEntityClass());
+		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
+		$this->viewVariable = $this->getConfig('viewVariable') ?? Inflector::variable($entityName);
+		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Starable')) {
+			$this->Controller->{$this->modelAlias}->behaviors()->load('Favorites.Starable', ['userModel' => $this->getConfig('userModel'), $this->getConfig('userModelClass')]);
+		}
 	}
 
 	/**
@@ -226,38 +218,6 @@ class FavoriteComponent extends Component {
 				return null;
 			}
 		}
-
-		$model = $this->Controller->fetchTable();
-		$this->modelAlias = $model->getAlias();
-
-		$parts = explode('\\', $model->getEntityClass());
-		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
-		$this->viewVariable = Inflector::variable($entityName);
-		//$this->Controller->helpers = array_merge($this->Controller->helpers, ['Favorites.FavoriteWidget', 'Time', 'Favorites.Cleaner', 'Favorites.Tree']);
-		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Favoriteable')) {
-			$this->Controller->{$this->modelAlias}->behaviors()->attach('Favorites.Favoriteable', ['userModel' => $this->userModel, 'userModelClass' => $this->userModelClass]);
-		}
-
-		/*
-        $this->Auth = $this->Controller->Auth;
-        if (!empty($this->Auth) && $this->Auth->user()) {
-            $this->Controller->set('isAuthorized', ($this->Auth->user('id') != ''));
-        }
-        */
-
-		/*
-        if (in_array($this->Controller->action, $this->deleteActions)) {
-            $this->Controller->{$this->modelAlias}->{$this->assocName}->softDelete(false);
-        } elseif ($this->unbindAssoc) {
-            foreach (['hasMany', 'hasOne'] as $assocType) {
-                if (array_key_exists($this->assocName, $this->Controller->{$this->modelAlias}->{$assocType})) {
-                    $this->Controller->{$this->modelAlias}->unbindModel([$assocType => [$this->assocName]], false);
-
-                    break;
-                }
-            }
-        }
-        */
 
 		if (!$this->Controller->getRequest()->is(['post', 'put', 'patch'])) {
 			return null;
@@ -282,11 +242,14 @@ class FavoriteComponent extends Component {
 			}
 		}
 
+		//TODO
+		/*
 		$type = $this->_call('initType');
 		$this->favoriteParams = array_merge($this->favoriteParams, ['displayType' => $type]);
 		$this->_call('view', [$type]);
 		$this->_call('prepareParams');
 		$this->Controller->set('favoriteParams', $this->favoriteParams);
+		*/
 	}
 
 	/**
@@ -314,28 +277,65 @@ class FavoriteComponent extends Component {
 		/** @var \Cake\Datasource\EntityInterface $entity */
 		$entity = $this->Controller->viewBuilder()->getVar($this->viewVariable);
 
+		if ($this->getConfig('useEntity')) {
+			$modelId = $entity->get('id');
+		} else {
+			$modelId = $data['id'];
+		}
+
 		$options = [
 			'userId' => $this->userId(),
-			'modelId' => $entity->get('id'),
-			'modelName' => $this->modelAlias,
+			'modelId' => $modelId,
+			'model' => $data['alias'],
 		];
+		$action = $data['action'] === 'unstar' ? 'removeStar' : 'addStar';
 
-		$result = $this->Controller->{$this->modelAlias}->addFavorite($options);
+		/** @var \Favorites\Model\Behavior\StarableBehavior $table */
+		$table = $this->Controller->{$this->modelAlias};
+		/**
+		 * @uses \Favorites\Model\Behavior\StarableBehavior::addStar()
+		 * @uses \Favorites\Model\Behavior\StarableBehavior::removeStar()
+		 */
+		$result = $table->$action($options);
+		if ($result === null) {
 
-		return $result;
+		}
+
+		return $this->prgRedirect();
+	}
+
+	/**
+	 * @param string $alias
+	 *
+	 * @return string
+	 */
+	protected function model(string $alias): string {
+		$model = Configure::read('Favorites.models.' . $alias);
+		if (!$model) {
+			throw new NotFoundException('Invalid alias');
+		}
+
+		return $model;
 	}
 
 	/**
 	 * @return int|null
 	 */
 	protected function userId() {
+		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
+
+		$uid = Configure::read('Auth.User.' . $userIdField);
+		if ($uid) {
+			return $uid;
+		}
+
 		$userId = $this->getConfig('userId') ?: null;
 		if (!$userId && $this->Controller->components()->has('AuthUser')) {
-			$userId = $this->Controller->AuthUser->user($this->getConfig('userIdField'));
+			$userId = $this->Controller->AuthUser->user($userIdField);
 		} elseif (!$userId && $this->Controller->components()->has('Auth')) {
-			$userId = $this->Controller->Auth->user($this->getConfig('userIdField'));
+			$userId = $this->Controller->Auth->user($userIdField);
 		} elseif (!$userId) {
-			$userId = $this->Controller->getRequest()->getSession()->read('Auth.User.' . $this->getConfig('userIdField'));
+			$userId = $this->Controller->getRequest()->getSession()->read('Auth.User.' . $userIdField);
 		}
 
 		return $userId;
@@ -396,7 +396,7 @@ class FavoriteComponent extends Component {
 	 */
 	protected function _prepareModel($options) {
 		$params = [
-			'userModel' => $this->userModel,
+			'userModel' => $this->getConfig('userModel'),
 			'userId' => $this->userId(),
 		];
 
@@ -411,8 +411,8 @@ class FavoriteComponent extends Component {
 	public function callbackPrepareParams() {
 		$this->favoriteParams = [
 			'viewFavorites' => $this->viewFavorites,
-			'modelName' => $this->modelAlias,
-			'userModel' => $this->userModel,
+			'modelName' => $this->modelName,
+			'userModel' => $this->getConfig('userModel'),
 		] + $this->favoriteParams;
 
 		$allowedParams = ['favorite', 'favorite_action', 'quote'];
@@ -552,10 +552,7 @@ class FavoriteComponent extends Component {
 	public function prgRedirect($urlBase = []) {
 		$isAjax = $this->Controller->getRequest()->getParam('isAjax') ?? false;
 
-		$url = array_merge(
-			array_diff_key($this->Controller->getRequest()->getParam('pass'), array_flip($this->_supportNamedParams)),
-			$urlBase,
-		);
+		$url = $this->Controller->getRequest()->getUri()->getPath();
 		if (!$isAjax) {
 			return $this->Controller->redirect($url);
 		}

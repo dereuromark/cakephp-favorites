@@ -92,7 +92,7 @@ class LikesHelper extends Helper {
 	 * @return string
 	 */
 	protected function model(string $alias): string {
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}

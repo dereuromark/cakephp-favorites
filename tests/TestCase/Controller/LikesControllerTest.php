@@ -37,7 +37,7 @@ class LikesControllerTest extends TestCase {
 	public function testLike(): void {
 		$this->disableErrorHandlerMiddleware();
 
-		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+		Configure::write('Favorites.models.Posts', 'Posts');
 
 		$this->session([
 			'Auth' => [
@@ -51,7 +51,7 @@ class LikesControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.controllerModels');
+		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -64,7 +64,7 @@ class LikesControllerTest extends TestCase {
 	public function testDislike(): void {
 		$this->disableErrorHandlerMiddleware();
 
-		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+		Configure::write('Favorites.models.Posts', 'Posts');
 
 		$this->session([
 			'Auth' => [
@@ -78,7 +78,7 @@ class LikesControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.controllerModels');
+		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -89,7 +89,7 @@ class LikesControllerTest extends TestCase {
 	public function testRemove(): void {
 		$favorite = $this->fetchTable('Favorites.Favorites')->find()->firstOrFail();
 
-		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+		Configure::write('Favorites.models.Posts', 'Posts');
 
 		$this->session([
 			'Auth' => [
@@ -103,7 +103,7 @@ class LikesControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.controllerModels');
+		Configure::delete('Favorites.models');
 	}
 
 	/**

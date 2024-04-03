@@ -17,8 +17,6 @@ Star type has a counter-cache option built-in (default false).
 There are different main strategies:
 
 - **Controller**: Posting to the plugin Favorites controller with a redirect back to the referer (current view)
-
-TODO:
 - **Action**: Posting to the same action as the favorite info is displayed, e.g. a specific entity view
 
 Each of those can also be done using AJAX instead of normal PRG.
@@ -33,7 +31,7 @@ Make sure to set ACL for this controller as only logged in people are allowed to
 Also specify a whitelist of models that can be used here in your app config:
 ```php
 'Favorites' => [
-    'controllerModels' => [
+    'models' => [
         'star' => [
             'Alias' => 'MyPlugin.MyModel',
         ],

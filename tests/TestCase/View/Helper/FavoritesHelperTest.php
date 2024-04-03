@@ -25,7 +25,7 @@ class FavoritesHelperTest extends TestCase {
 		$view = new View();
 		$this->Favorites = new FavoritesHelper($view);
 
-		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+		Configure::write('Favorites.models.Posts', 'Posts');
 		$this->loadRoutes();
 	}
 
@@ -37,7 +37,7 @@ class FavoritesHelperTest extends TestCase {
 
 		parent::tearDown();
 
-		Configure::delete('Favorites.controllerModels.Posts');
+		Configure::delete('Favorites.models.Posts');
 	}
 
 	/**

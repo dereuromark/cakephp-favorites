@@ -37,7 +37,7 @@ class StarsControllerTest extends TestCase {
 	public function testStar(): void {
 		$this->disableErrorHandlerMiddleware();
 
-		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+		Configure::write('Favorites.models.Posts', 'Posts');
 
 		$this->session([
 			'Auth' => [
@@ -51,7 +51,7 @@ class StarsControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.controllerModels');
+		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -62,7 +62,7 @@ class StarsControllerTest extends TestCase {
 	public function testUnstar(): void {
 		$favorite = $this->fetchTable('Favorites.Favorites')->find()->firstOrFail();
 
-		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+		Configure::write('Favorites.models.Posts', 'Posts');
 
 		$this->session([
 			'Auth' => [
@@ -76,7 +76,7 @@ class StarsControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.controllerModels');
+		Configure::delete('Favorites.models');
 	}
 
 	/**

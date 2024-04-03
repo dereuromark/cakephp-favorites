@@ -42,7 +42,7 @@ class StarsController extends AppController {
 	public function star($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}
@@ -71,7 +71,7 @@ class StarsController extends AppController {
 	public function unstar($alias = null, $id = null) {
 		$this->request->allowMethod(['post', 'delete']);
 
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}

@@ -7,6 +7,7 @@ use Cake\ORM\Behavior;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
+use Favorites\Utility\Config;
 
 class StarableBehavior extends Behavior {
 
@@ -51,14 +52,15 @@ class StarableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$this->setConfig('model', $this->_table->getAlias());
+			$modelAlias = Config::alias($this->_table->getRegistryAlias(), Config::TYPE_STAR) ?: $this->_table->getAlias();
+			$this->setConfig('model', $modelAlias);
 		}
 		if (!$this->getConfig('modelClass')) {
 			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
 		}
 		if (!$this->getConfig('userModel')) {
-			[, $alias] = pluginSplit($this->getConfig('userModelClass'));
-			$this->setConfig('userModel', $alias);
+			[, $userModelAlias] = pluginSplit($this->getConfig('userModelClass'));
+			$this->setConfig('userModel', $userModelAlias);
 		}
 
 		$this->_table->hasMany('Favorites', [
@@ -88,7 +90,9 @@ class StarableBehavior extends Behavior {
 				'foreignKey' => 'user_id',
 				//'counterCache' => true,
 			];
+			$x = $this->getConfig('userModel');
 			$this->favoritesTable()->belongsTo($this->getConfig('userModel'), $userConfig);
+			//dd($this->favoritesTable()->$x->getTarget()->find()->all()->toArray());
 		}
 	}
 

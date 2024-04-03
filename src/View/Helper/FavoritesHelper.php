@@ -27,7 +27,7 @@ class FavoritesHelper extends Helper {
 	 * @return string
 	 */
 	public function urlAdd(string $alias, int|string $id): string {
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}
@@ -44,7 +44,7 @@ class FavoritesHelper extends Helper {
 	 * @return string
 	 */
 	public function urlRemove(string $alias, int|string $id): string {
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}

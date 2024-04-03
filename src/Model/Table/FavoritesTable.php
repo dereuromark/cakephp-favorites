@@ -2,6 +2,7 @@
 
 namespace Favorites\Model\Table;
 
+use Cake\Core\Configure;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -42,7 +43,7 @@ class FavoritesTable extends Table {
 
 		$this->addBehavior('Timestamp');
 
-		$this->belongsTo('Users');
+		$this->belongsTo('Users', ['className' => Configure::read('Favorites.userModelClass') ?: 'Users']);
 	}
 
 	/**

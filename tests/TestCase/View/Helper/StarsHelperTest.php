@@ -33,7 +33,7 @@ class StarsHelperTest extends TestCase {
 		$view = new View();
 		$this->Stars = new StarsHelper($view);
 
-		Configure::write('Favorites.controllerModels.Posts', 'Posts');
+		Configure::write('Favorites.models.Posts', 'Posts');
 		$this->loadRoutes();
 	}
 
@@ -45,7 +45,7 @@ class StarsHelperTest extends TestCase {
 
 		parent::tearDown();
 
-		Configure::delete('Favorites.controllerModels.Posts');
+		Configure::delete('Favorites.models.Posts');
 	}
 
 	/**
@@ -64,6 +64,7 @@ class StarsHelperTest extends TestCase {
 	 */
 	public function testLinkIcon(): void {
 		Configure::write('Auth.User.id', 1);
+		$this->Stars->setConfig('html', '<span class="fa-solid fa-star%s"%s></span>');
 
 		$result = $this->Stars->linkIcon('Posts', 1);
 		$this->assertStringStartsWith('<a href="#" onclick="document.post_', $result);
@@ -86,7 +87,7 @@ class StarsHelperTest extends TestCase {
 
 		$result = $this->Stars->linkIcon('Posts', 1);
 		$this->assertStringStartsWith('<a href="#" onclick="document.post_', $result);
-		$this->assertStringEndsWith('><span class="fa-solid fa-star starred" title="Starred by you. Click to unstar." style="color: #ffa500"></span></a>', $result);
+		$this->assertStringEndsWith('><span class="star starred" title="Starred by you. Click to unstar." style="color: #ffa500">★</span></a>', $result);
 	}
 
 	/**

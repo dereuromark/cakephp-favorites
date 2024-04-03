@@ -2,12 +2,13 @@
 
 namespace Favorites\View\Helper;
 
+use BadMethodCallException;
 use Cake\Core\Configure;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\View\Helper;
-use InvalidArgumentException;
+use Favorites\Utility\Config;
 
 /**
  * @property \Cake\View\Helper\UrlHelper $Url
@@ -19,10 +20,21 @@ class StarsHelper extends Helper {
 	use AuthTrait;
 
 	/**
+	 * @var int
+	 */
+	public const HTML_TYPE_UTF8 = 0;
+
+	/**
+	 * @var int
+	 */
+	public const HTML_TYPE_FA6 = 1;
+
+	/**
 	 * @var array<string, mixed>
 	 */
 	protected array $_defaultConfig = [
-		'html' => '<span class="fa-solid fa-star%s"%s></span>',
+		'strategy' => Config::STRATEGY_CONTROLLER,
+		'html' => null,
 		'colorMap' => [],
 	];
 
@@ -33,6 +45,28 @@ class StarsHelper extends Helper {
 		'Url',
 		'Form',
 	];
+
+	/**
+	 * @param array<string, mixed> $config
+	 *
+	 * @return void
+	 */
+	public function initialize(array $config): void {
+		parent::initialize($config);
+
+		/** @var string|int|null $iconType */
+		$iconType = $this->getConfig('html');
+		if ($iconType === null) {
+			$iconType = static::HTML_TYPE_UTF8;
+		}
+
+		$html = match ($iconType) {
+			static::HTML_TYPE_UTF8 => '<span class="star%s"%s>★</span>',
+			static::HTML_TYPE_FA6 => '<span class="fa-solid fa-star%s"%s></span>',
+			default => $iconType,
+		};
+		$this->setConfig('html', $html);
+	}
 
 	/**
 	 * @param string $alias
@@ -82,12 +116,12 @@ class StarsHelper extends Helper {
 			$value = $this->value($alias, $id);
 		}
 
-		$action = $value ? 'unstar' : 'star';
-		$url = ['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id];
-
 		$icon = $this->icon($alias, $id, $value);
+		$action = $value ? 'unstar' : 'star';
+		$url = $this->url($action, $alias, $id);
+		$data = $this->data($action, $alias, $id);
 
-		return $this->Form->postLink($icon, $url, ['escapeTitle' => false, 'block' => true]);
+		return $this->Form->postLink($icon, $url, ['escapeTitle' => false, 'block' => true, 'data' => $data]);
 	}
 
 	/**
@@ -126,17 +160,13 @@ class StarsHelper extends Helper {
 			throw new MethodNotAllowedException('Must be logged in');
 		}
 
-		$model = $this->model($alias);
-		if (!$model) {
-			throw new InvalidArgumentException('Model not found for alias ' . $alias);
-		}
 		$class = Configure::read('Favorites.favoriteClass') ?: 'Favorites.Favorites';
 		$table = $this->fetchModel($class);
 
 		$entity = $table->find()
 			->select(['id'])
 			->where([
-			'model' => $model,
+			'model' => $alias,
 			'foreign_key' => $id,
 			'user_id' => $uid,
 		])->first();
@@ -150,12 +180,46 @@ class StarsHelper extends Helper {
 	 * @return string
 	 */
 	protected function model(string $alias): string {
-		$model = Configure::read('Favorites.controllerModels.' . $alias);
+		$model = Configure::read('Favorites.models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}
 
 		return $model;
+	}
+
+	/**
+	 * @param string $action
+	 * @param string $alias
+	 * @param string|int $id
+	 *
+	 * @return array|string
+	 */
+	protected function url(string $action, string $alias, int|string $id): string|array {
+		$strategy = Config::strategy($this->getConfig('strategy'));
+
+		return match ($strategy) {
+			Config::STRATEGY_ACTION => $this->_View->getRequest()->getUri()->getPath(), //['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
+			Config::STRATEGY_CONTROLLER => ['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
+			default => throw new BadMethodCallException('Not implemented'),
+		};
+	}
+
+	/**
+	 * @param string $action
+	 * @param string $alias
+	 * @param string|int $id
+	 *
+	 * @return array
+	 */
+	protected function data(string $action, string $alias, int|string $id): array {
+		$strategy = Config::strategy($this->getConfig('strategy'));
+
+		return match ($strategy) {
+			Config::STRATEGY_ACTION => ['favorite' => 'star', 'action' => $action, 'alias' => $alias, 'id' => $id],
+			Config::STRATEGY_CONTROLLER => [],
+			default => throw new BadMethodCallException('Not implemented'),
+		};
 	}
 
 }
