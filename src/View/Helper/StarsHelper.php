@@ -52,20 +52,18 @@ class StarsHelper extends Helper {
 	 * @return void
 	 */
 	public function initialize(array $config): void {
-		parent::initialize($config);
+		$config += (array)Configure::read('Favorites');
 
 		/** @var string|int|null $iconType */
-		$iconType = $this->getConfig('html');
-		if ($iconType === null) {
-			$iconType = static::HTML_TYPE_UTF8;
-		}
-
+		$iconType = $config['html'] ?? static::HTML_TYPE_UTF8;
 		$html = match ($iconType) {
 			static::HTML_TYPE_UTF8 => '<span class="star%s"%s>★</span>',
 			static::HTML_TYPE_FA6 => '<span class="fa-solid fa-star%s"%s></span>',
 			default => $iconType,
 		};
-		$this->setConfig('html', $html);
+		$config['html'] = $html;
+
+		$this->setConfig($config);
 	}
 
 	/**
@@ -160,7 +158,7 @@ class StarsHelper extends Helper {
 			throw new MethodNotAllowedException('Must be logged in');
 		}
 
-		$class = Configure::read('Favorites.favoriteClass') ?: 'Favorites.Favorites';
+		$class = $this->getConfig('favoriteClass') ?: 'Favorites.Favorites';
 		$table = $this->fetchModel($class);
 
 		$entity = $table->find()
@@ -180,7 +178,7 @@ class StarsHelper extends Helper {
 	 * @return string
 	 */
 	protected function model(string $alias): string {
-		$model = Configure::read('Favorites.models.' . $alias);
+		$model = $this->getConfig('models.' . $alias);
 		if (!$model) {
 			throw new NotFoundException('Invalid alias');
 		}
