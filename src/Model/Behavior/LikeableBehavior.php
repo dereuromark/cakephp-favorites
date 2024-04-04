@@ -64,14 +64,18 @@ class LikeableBehavior extends Behavior {
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
-			'conditions' => ['Favorites.model' => "{$this->_table->getAlias()}"],
+			'conditions' => ['Favorites.model' => $this->getConfig('model')],
 			'dependent' => true,
 		]);
 
-		$this->favoritesTable()->belongsTo($this->getConfig('model'), [
-			'className' => $this->getConfig('modelClass'),
-			'foreignKey' => 'foreign_key',
-		]);
+		if (!empty($config['userId'])) {
+			$this->_table->hasOne('Liked', [
+				'className' => $this->getConfig('favoriteClass'),
+				'foreignKey' => 'foreign_key',
+				'conditions' => ['Liked.model' => $this->getConfig('model'), 'Liked.user_id' => $config['userId']],
+				'dependent' => true,
+			]);
+		}
 
 		if (!empty($config['userModelConfig']) && is_array($config['userModelConfig'])) {
 			$this->favoritesTable()->belongsTo($config['userModel'], $config['userModelConfig']);
@@ -87,7 +91,7 @@ class LikeableBehavior extends Behavior {
 	/**
 	 * Handle adding favorites
 	 *
-	 * @param array $options extra information and favorite statistics
+	 * @param array<string, mixed> $options
 	 *
 	 * @throws \Cake\Http\Exception\MethodNotAllowedException
 	 *
@@ -107,7 +111,7 @@ class LikeableBehavior extends Behavior {
 	/**
 	 * Handle adding favorites
 	 *
-	 * @param array $options extra information and favorite statistics
+	 * @param array<string, mixed> $options
 	 *
 	 * @throws \Cake\Http\Exception\MethodNotAllowedException
 	 *
@@ -122,6 +126,21 @@ class LikeableBehavior extends Behavior {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Handle removing entry
+	 *
+	 * @param array<string, mixed> $options
+	 *
+	 * @throws \Cake\Http\Exception\MethodNotAllowedException
+	 *
+	 * @return int
+	 */
+	public function remove(array $options = []): int {
+		$options += ['model' => $this->getConfig('model'), 'modelId' => null, 'userId' => null];
+
+		return $this->favoritesTable()->remove($options['model'], $options['modelId'], $options['userId']);
 	}
 
 	/**

@@ -65,13 +65,16 @@ class FavoriteableBehavior extends Behavior {
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
-			'conditions' => ['Favorites.model' => "{$this->_table->getAlias()}"],
+			'conditions' => ['Favorites.model' => $this->getConfig('model')],
 			'dependent' => true,
 		]);
 
-		if ($this->getConfig('countFavorites')) {
-			$this->favoritesTable()->addBehavior('CounterCache', [
-				$this->_table->getAlias() => [$this->getConfig('fieldCounter')],
+		if (!empty($config['userId'])) {
+			$this->_table->hasOne('Favorite', [
+				'className' => $this->getConfig('favoriteClass'),
+				'foreignKey' => 'foreign_key',
+				'conditions' => ['Favorite.model' => $this->getConfig('model'), 'Favorite.user_id' => $config['userId']],
+				'dependent' => true,
 			]);
 		}
 
@@ -94,7 +97,7 @@ class FavoriteableBehavior extends Behavior {
 	/**
 	 * Handle adding favorites
 	 *
-	 * @param array $options extra information and favorite statistics
+	 * @param array<string, mixed> $options
 	 *
 	 * @throws \Cake\Http\Exception\MethodNotAllowedException
 	 *
@@ -114,7 +117,7 @@ class FavoriteableBehavior extends Behavior {
 	/**
 	 * Handle adding favorites
 	 *
-	 * @param array $options extra information and favorite statistics
+	 * @param array<string, mixed> $options
 	 *
 	 * @throws \Cake\Http\Exception\MethodNotAllowedException
 	 *

@@ -238,7 +238,11 @@ class FavoriteableComponent extends Component {
 		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
 		$this->viewVariable = Inflector::variable($entityName);
 		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Favoriteable')) {
-			$this->Controller->{$this->modelAlias}->behaviors()->load('Favorites.Favoriteable', ['userModel' => $this->userModel, 'userModelClass' => $this->userModelClass]);
+			$config = [
+				'userModelClass' => $this->getConfig('userModelClass'),
+				'userId' => $this->userId(),
+			];
+			$this->Controller->{$this->modelAlias}->behaviors()->load('Favorites.Favoriteable', $config);
 		}
 
 		if (!$this->Controller->getRequest()->is(['post', 'put', 'patch'])) {
@@ -283,29 +287,29 @@ class FavoriteableComponent extends Component {
 			return null;
 		}
 
-		return $this->add($data);
-	}
-
-	/**
-	 * //FIXME
-	 *
-	 * @param array $data
-	 *
-	 * @return mixed
-	 */
-	protected function add(array $data) {
 		assert($this->viewVariable !== null);
 
 		/** @var \Cake\Datasource\EntityInterface $entity */
 		$entity = $this->Controller->viewBuilder()->getVar($this->viewVariable);
 
+		if ($this->getConfig('useEntity')) {
+			$modelId = $entity->get('id');
+		} else {
+			$modelId = $data['id'];
+		}
+
 		$options = [
 			'userId' => $this->userId(),
-			'modelId' => $entity->get('id'),
-			'modelName' => $this->modelAlias,
+			'modelId' => $modelId,
+			'model' => $data['alias'],
+			'value' => $data['value'] !== null ? (int)$data['value'] : null,
 		];
+		$action = $data['action'] === 'remove' ? 'removeFavorite' : 'addFavorite';
 
-		$result = $this->Controller->{$this->modelAlias}->addFavorite($options);
+		$result = $this->Controller->{$this->modelAlias}->$action($options);
+		if ($result === null) {
+			$this->Flash->error(__d('favorites', 'An error occurred.'));
+		}
 
 		return $result;
 	}
@@ -314,13 +318,20 @@ class FavoriteableComponent extends Component {
 	 * @return int|null
 	 */
 	protected function userId() {
+		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
+
+		$uid = Configure::read('Auth.User.' . $userIdField);
+		if ($uid) {
+			return $uid;
+		}
+
 		$userId = $this->getConfig('userId') ?: null;
 		if (!$userId && $this->Controller->components()->has('AuthUser')) {
-			$userId = $this->Controller->AuthUser->user($this->getConfig('userIdField'));
+			$userId = $this->Controller->AuthUser->user($userIdField);
 		} elseif (!$userId && $this->Controller->components()->has('Auth')) {
-			$userId = $this->Controller->Auth->user($this->getConfig('userIdField'));
+			$userId = $this->Controller->Auth->user($userIdField);
 		} elseif (!$userId) {
-			$userId = $this->Controller->getRequest()->getSession()->read('Auth.User.' . $this->getConfig('userIdField'));
+			$userId = $this->Controller->getRequest()->getSession()->read('Auth.User.' . $userIdField);
 		}
 
 		return $userId;
@@ -375,7 +386,7 @@ class FavoriteableComponent extends Component {
 	/**
 	 * Prepare model association to fetch data
 	 *
-	 * @param array $options
+	 * @param array<string, mixed> $options
 	 *
 	 * @return bool
 	 */
@@ -386,28 +397,6 @@ class FavoriteableComponent extends Component {
 		];
 
 		return $this->Controller->{$this->modelAlias}->favoriteBeforeFind(array_merge($params, $options));
-	}
-
-	/**
-	 * Prepare passed parameters.
-	 *
-	 * @return void
-	 */
-	public function callbackPrepareParams() {
-		$this->favoriteParams = [
-			'viewFavorites' => $this->viewFavorites,
-			'modelName' => $this->modelAlias,
-			'userModel' => $this->userModel,
-		] + $this->favoriteParams;
-
-		$allowedParams = ['favorite', 'favorite_action', 'quote'];
-		foreach ($allowedParams as $param) {
-			/*
-            if (isset($this->Controller->passedArgs[$param])) {
-                $this->favoriteParams[$param] = $this->Controller->passedArgs[$param];
-            }
-            */
-		}
 	}
 
 	/**
@@ -582,7 +571,7 @@ class FavoriteableComponent extends Component {
 	/**
 	 * Non view action process method
 	 *
-	 * @param array $options
+	 * @param array<string, mixed> $options
 	 *
 	 * @return void
 	 */

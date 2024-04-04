@@ -97,7 +97,14 @@ class StarsHelperTest extends TestCase {
 	 */
 	public function testUrlStar(): void {
 		$result = $this->Stars->urlStar('Posts', 1);
-		$this->assertSame('/favorites/Stars/star/Posts/1', $result);
+		$expected = [
+			'plugin' => 'Favorites',
+			'controller' => 'Stars',
+			'action' => 'star',
+			'Posts',
+			1,
+		];
+		$this->assertEquals($expected, $result);
 	}
 
 	/**
@@ -107,7 +114,14 @@ class StarsHelperTest extends TestCase {
 	 */
 	public function testUrlUnstar(): void {
 		$result = $this->Stars->urlUnstar('Posts', 1);
-		$this->assertSame('/favorites/Stars/unstar/Posts/1', $result);
+		$expected = [
+			'plugin' => 'Favorites',
+			'controller' => 'Stars',
+			'action' => 'unstar',
+			'Posts',
+			1,
+		];
+		$this->assertEquals($expected, $result);
 	}
 
 }

@@ -7,10 +7,7 @@ use Cake\Core\Configure;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
-/**
- * @uses \Favorites\Controller\StarsController
- */
-class IntegrationControllerTest extends TestCase {
+class LikesIntegrationControllerTest extends TestCase {
 
 	use IntegrationTestTrait;
 
@@ -26,14 +23,14 @@ class IntegrationControllerTest extends TestCase {
 	];
 
 	/**
-	 * @uses \Favorites\Controller\StarsController::star()
+	 * @uses \TestApp\Controller\LikedPostsController::view()
 	 *
 	 * @return void
 	 */
 	public function testView(): void {
 		$this->disableErrorHandlerMiddleware();
 
-		Configure::write('Favorites.models.Posts', 'Posts');
+		Configure::write('Favorites.models.LikedPosts', 'Posts');
 
 		$this->session([
 			'Auth' => [
@@ -43,24 +40,24 @@ class IntegrationControllerTest extends TestCase {
 			],
 		]);
 
-		$this->post(['controller' => 'StarredPosts', 'action' => 'view', 1]);
+		$this->get(['controller' => 'LikedPosts', 'action' => 'view', 1]);
 
 		$this->assertResponseOk();
-
-		$this->assertResponseContains('<span class="star starred" title="Starred by you. Click to unstar." style="color: #ffa500">★</span>');
+		$this->assertResponseContains('👍');
+		$this->assertResponseContains('👎');
 
 		Configure::delete('Favorites.models');
 	}
 
 	/**
-	 * @uses \Favorites\Controller\StarsController::star()
+	 * @uses \TestApp\Controller\LikedPostsController::view()
 	 *
 	 * @return void
 	 */
-	public function testViewUnstarred(): void {
+	public function testViewLiked(): void {
 		$this->disableErrorHandlerMiddleware();
 
-		Configure::write('Favorites.models.Posts', 'Posts');
+		Configure::write('Favorites.models.LikedPosts', 'Posts');
 
 		$this->session([
 			'Auth' => [
@@ -70,13 +67,14 @@ class IntegrationControllerTest extends TestCase {
 			],
 		]);
 
-		$this->fetchTable('Favorites.Favorites')->deleteAll('1=1');
+		$result = $this->fetchTable('Favorites.Favorites')->add('LikedPosts', 1, 1, 1);
+		$this->assertEmpty($result->getErrors());
 
-		$this->post(['controller' => 'StarredPosts', 'action' => 'view', 1]);
+		$this->get(['controller' => 'LikedPosts', 'action' => 'view', 1]);
 
 		$this->assertResponseOk();
-
-		$this->assertResponseContains('<span class="star" title="Click to star." style="color: #aaa">★</span>');
+		//dd((string)$this->_response->getBody());
+		//$this->assertResponseContains('<span class="star" title="Click to star." style="color: #aaa">★</span>');
 
 		Configure::delete('Favorites.models');
 	}

@@ -47,7 +47,14 @@ class FavoritesHelperTest extends TestCase {
 	 */
 	public function testUrlAdd(): void {
 		$result = $this->Favorites->urlAdd('Posts', 1);
-		$this->assertEquals('/favorites/Favorites/add/Posts/1', $result);
+		$expected = [
+			'plugin' => 'Favorites',
+			'controller' => 'Favorites',
+			'action' => 'add',
+			'Posts',
+			1,
+		];
+		$this->assertEquals($expected, $result);
 	}
 
 	/**
@@ -57,7 +64,14 @@ class FavoritesHelperTest extends TestCase {
 	 */
 	public function testUrlRemove(): void {
 		$result = $this->Favorites->urlRemove('Posts', 1);
-		$this->assertEquals('/favorites/Favorites/remove/Posts/1', $result);
+		$expected = [
+			'plugin' => 'Favorites',
+			'controller' => 'Favorites',
+			'action' => 'remove',
+			'Posts',
+			1,
+		];
+		$this->assertEquals($expected, $result);
 	}
 
 }

@@ -30,20 +30,20 @@ class StarsHelper extends Helper {
 	public const HTML_TYPE_FA6 = 1;
 
 	/**
+	 * @var array
+	 */
+	protected array $helpers = [
+		'Url',
+		'Form',
+	];
+
+	/**
 	 * @var array<string, mixed>
 	 */
 	protected array $_defaultConfig = [
 		'strategy' => Config::STRATEGY_CONTROLLER,
 		'html' => null,
 		'colorMap' => [],
-	];
-
-	/**
-	 * @var array
-	 */
-	protected array $helpers = [
-		'Url',
-		'Form',
 	];
 
 	/**
@@ -126,30 +126,6 @@ class StarsHelper extends Helper {
 	 * @param string $alias
 	 * @param string|int $id
 	 *
-	 * @throws \Cake\Http\Exception\NotFoundException
-	 *
-	 * @return string
-	 */
-	public function urlStar(string $alias, int|string $id): string {
-		return $this->Url->build(['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => 'star', $alias, $id]);
-	}
-
-	/**
-	 * @param string $alias
-	 * @param string|int $id
-	 *
-	 * @throws \Cake\Http\Exception\NotFoundException
-	 *
-	 * @return string
-	 */
-	public function urlUnstar(string $alias, int|string $id): string {
-		return $this->Url->build(['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => 'unstar', $alias, $id]);
-	}
-
-	/**
-	 * @param string $alias
-	 * @param string|int $id
-	 *
 	 * @return bool
 	 */
 	public function value(string $alias, int|string $id): bool {
@@ -164,10 +140,10 @@ class StarsHelper extends Helper {
 		$entity = $table->find()
 			->select(['id'])
 			->where([
-			'model' => $alias,
-			'foreign_key' => $id,
-			'user_id' => $uid,
-		])->first();
+				'model' => $alias,
+				'foreign_key' => $id,
+				'user_id' => $uid,
+			])->first();
 
 		return (bool)$entity;
 	}
@@ -199,8 +175,32 @@ class StarsHelper extends Helper {
 		return match ($strategy) {
 			Config::STRATEGY_ACTION => $this->_View->getRequest()->getUri()->getPath(), //['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
 			Config::STRATEGY_CONTROLLER => ['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
-			default => throw new BadMethodCallException('Not implemented'),
+			default => throw new BadMethodCallException('Not implemented: ' . $strategy),
 		};
+	}
+
+	/**
+	 * @param string $alias
+	 * @param string|int $id
+	 *
+	 * @throws \Cake\Http\Exception\NotFoundException
+	 *
+	 * @return array|string
+	 */
+	public function urlStar(string $alias, int|string $id): string|array {
+		return $this->url('star', $alias, $id);
+	}
+
+	/**
+	 * @param string $alias
+	 * @param string|int $id
+	 *
+	 * @throws \Cake\Http\Exception\NotFoundException
+	 *
+	 * @return array|string
+	 */
+	public function urlUnstar(string $alias, int|string $id): string|array {
+		return $this->url('unstar', $alias, $id);
 	}
 
 	/**
@@ -216,7 +216,7 @@ class StarsHelper extends Helper {
 		return match ($strategy) {
 			Config::STRATEGY_ACTION => ['favorite' => 'star', 'action' => $action, 'alias' => $alias, 'id' => $id],
 			Config::STRATEGY_CONTROLLER => [],
-			default => throw new BadMethodCallException('Not implemented'),
+			default => throw new BadMethodCallException('Not implemented: ' . $strategy),
 		};
 	}
 

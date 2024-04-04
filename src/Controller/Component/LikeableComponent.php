@@ -49,7 +49,7 @@ use Cake\Utility\Inflector;
  *
  * @method \App\Controller\AppController getController()
  */
-class StarableComponent extends Component {
+class LikeableComponent extends Component {
 
 	/**
 	 * @var array<string, mixed>
@@ -196,12 +196,12 @@ class StarableComponent extends Component {
 		$parts = explode('\\', $model->getEntityClass());
 		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
 		$this->viewVariable = $this->getConfig('viewVariable') ?? Inflector::variable($entityName);
-		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Starable')) {
+		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Likeable')) {
 			$config = [
 				'userModelClass' => $this->getConfig('userModelClass'),
 				'userId' => $this->userId(),
 			];
-			$this->Controller->{$this->modelAlias}->behaviors()->load('Favorites.Starable', $config);
+			$this->Controller->{$this->modelAlias}->behaviors()->load('Favorites.Likeable', $config);
 		}
 	}
 
@@ -243,15 +243,6 @@ class StarableComponent extends Component {
 				return null;
 			}
 		}
-
-		//TODO
-		/*
-		$type = $this->_call('initType');
-		$this->favoriteParams = array_merge($this->favoriteParams, ['displayType' => $type]);
-		$this->_call('view', [$type]);
-		$this->_call('prepareParams');
-		$this->Controller->set('favoriteParams', $this->favoriteParams);
-		*/
 	}
 
 	/**
@@ -279,13 +270,14 @@ class StarableComponent extends Component {
 			'modelId' => $modelId,
 			'model' => $data['alias'],
 		];
-		$action = $data['action'] === 'unstar' ? 'removeStar' : 'addStar';
+		$action = $this->action($data['action']);
 
-		/** @var \Favorites\Model\Behavior\StarableBehavior $table */
+		/** @var \Favorites\Model\Behavior\LikeableBehavior $table */
 		$table = $this->Controller->{$this->modelAlias};
 		/**
-		 * @uses \Favorites\Model\Behavior\StarableBehavior::addStar()
-		 * @uses \Favorites\Model\Behavior\StarableBehavior::removeStar()
+		 * @uses \Favorites\Model\Behavior\LikeableBehavior::addLike()
+		 * @uses \Favorites\Model\Behavior\LikeableBehavior::addDislike()
+		 * @uses \Favorites\Model\Behavior\LikeableBehavior::remove()
 		 */
 		$result = $table->$action($options);
 		if ($result === null) {
@@ -356,9 +348,11 @@ class StarableComponent extends Component {
 	 * Redirects the user to the wanted action by persisting passed args excepted
 	 * the ones used internally by the component
 	 *
+	 * @param array $urlBase
+	 *
 	 * @return \Cake\Http\Response|null|void
 	 */
-	public function prgRedirect() {
+	public function prgRedirect($urlBase = []) {
 		$isAjax = $this->Controller->getRequest()->getParam('isAjax') ?? false;
 
 		$url = $this->Controller->getRequest()->getUri()->getPath();
@@ -372,64 +366,17 @@ class StarableComponent extends Component {
 	}
 
 	/**
-	 * Call action from component or overridden action from controller.
+	 * @param string $action
 	 *
-	 * @param string $method
-	 * @param array $args
-	 *
-	 * @throws \BadMethodCallException
-	 *
-	 * @return mixed
+	 * @return string
 	 */
-	protected function _call($method, $args = []) {
-		$methodName = 'callbackFavorites' . Inflector::camelize(Inflector::underscore($method));
-		$localMethodName = 'callback' . $method;
-		if (method_exists($this->Controller, $methodName)) {
-			/** @var callable $callable */
-			$callable = [$this->Controller, $methodName];
-
-			return call_user_func_array($callable, $args);
-		}
-		if (method_exists($this, $localMethodName)) {
-			/** @var callable $callable */
-			$callable = [$this, $localMethodName];
-
-			return call_user_func_array($callable, $args);
-		}
-
-			throw new BadMethodCallException();
-	}
-
-	/**
-	 * Non view action process method
-	 *
-	 * @param array<string, mixed> $options
-	 *
-	 * @return void
-	 */
-	protected function _processActions(array $options) {
-		//extract($options);
-		$id = $options['id'];
-		$displayType = $options['displayType'];
-
-		if (isset($this->Controller->passedArgs['favorite'])) {
-			if ($this->userId()) {
-				if (isset($this->Controller->passedArgs['favorite_action'])) {
-					$favoriteAction = $this->Controller->passedArgs['favorite_action'];
-					if (!in_array($favoriteAction, ['toggle_approve', 'delete'])) {
-						//return $this->Controller->blackHole("FavoritesComponent: unsupported favorite_Action '$favoriteAction'");
-					}
-					$this->_call(Inflector::variable($favoriteAction), [$id, $this->Controller->passedArgs['favorite']]);
-				} else {
-					//Configure::write('Favorite.action', 'add');
-					$parent = empty($this->Controller->passedArgs['favorite']) ? null : $this->Controller->passedArgs['favorite'];
-					$this->_call('add', [$id, $parent, $displayType]);
-				}
-			} else {
-				//$this->Controller->Session->write('Auth.redirect', $this->Controller->request['url']);
-				$this->Controller->redirect($this->Controller->Auth->getConfig('loginAction'));
-			}
-		}
+	protected function action(string $action): string {
+		return match ($action) {
+			'like' => 'addLike',
+			'dislike' => 'addDislike',
+			'remove' => 'remove',
+			default => throw new BadMethodCallException('Not implemented: ' . $action)
+		};
 	}
 
 }

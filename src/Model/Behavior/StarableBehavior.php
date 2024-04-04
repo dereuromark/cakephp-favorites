@@ -106,7 +106,7 @@ class StarableBehavior extends Behavior {
 	/**
 	 * Handle adding stars
 	 *
-	 * @param array $options extra information and favorite statistics
+	 * @param array<string, mixed> $options
 	 *
 	 * @throws \Cake\Http\Exception\MethodNotAllowedException
 	 *
@@ -126,7 +126,7 @@ class StarableBehavior extends Behavior {
 	/**
 	 * Handle adding stars
 	 *
-	 * @param array $options extra information and favorite statistics
+	 * @param array<string, mixed> $options
 	 *
 	 * @throws \Cake\Http\Exception\MethodNotAllowedException
 	 *

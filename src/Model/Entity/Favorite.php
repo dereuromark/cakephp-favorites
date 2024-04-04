@@ -11,7 +11,7 @@ use Cake\ORM\Entity;
  * @property int $user_id
  * @property int|null $value
  * @property \Cake\I18n\DateTime $created
- * @property \App\Model\Entity\User $user
+ * @property \Cake\ORM\Entity $user
  */
 class Favorite extends Entity {
 
