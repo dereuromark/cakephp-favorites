@@ -311,7 +311,7 @@ class FavoriteableComponent extends Component {
 			$this->Flash->error(__d('favorites', 'An error occurred.'));
 		}
 
-		return $result;
+		return $this->prgRedirect();
 	}
 
 	/**
