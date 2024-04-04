@@ -52,3 +52,6 @@ For ratings (e.g. 1-5 star range) use https://github.com/dereuromark/cakephp-rat
 
 ### Install, Setup, Usage
 See the **[Docs](docs/README.md)** for details.
+
+### Demo
+See https://sandbox.dereuromark.de/sandbox/favorite-examples
