@@ -28,7 +28,7 @@ class FavoritesFixture extends TestFixture {
 		'value' => ['type' => 'tinyinteger', 'length' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
 		'created' => ['type' => 'datetime', 'length' => null, 'null' => false, 'default' => null, 'comment' => ''],
 		'_indexes' => [
-			'user_id' => ['type' => 'index', 'columns' => ['user_id'], 'length' => []],
+			'favorites_user_id' => ['type' => 'index', 'columns' => ['user_id'], 'length' => []],
 			'foreign_key' => ['type' => 'index', 'columns' => ['model', 'foreign_key'], 'length' => []],
 		],
 		'_constraints' => [
