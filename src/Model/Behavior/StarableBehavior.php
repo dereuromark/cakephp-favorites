@@ -26,7 +26,7 @@ class StarableBehavior extends Behavior {
 			'starred' => 'findStarred',
 			'starredBy' => 'findStarredBy',
 		],
-		'fieldCounter' => 'starred_count', //TODO
+		'fieldCounter' => 'starred_count',
 	];
 
 	/**
@@ -82,7 +82,10 @@ class StarableBehavior extends Behavior {
 
 		if ($this->getConfig('counterCache')) {
 			$this->favoritesTable()->addBehavior('CounterCache', [
-				$this->_table->getAlias() => [$this->getConfig('fieldCounter')],
+				$this->_table->getAlias() => [
+			$this->getConfig('fieldCounter') => [
+					'conditions' => ['Favorites.model' => $this->getConfig('model')],
+				]],
 			]);
 		}
 
