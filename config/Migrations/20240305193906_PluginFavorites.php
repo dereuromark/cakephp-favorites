@@ -44,7 +44,7 @@ class PluginFavorites extends AbstractMigration {
 					'user_id',
 				],
 				[
-					'name' => 'user_id',
+					'name' => 'favorite_user_id',
 				],
 			)
 			->addIndex(
@@ -53,7 +53,7 @@ class PluginFavorites extends AbstractMigration {
 					'foreign_key',
 				],
 				[
-					'name' => 'foreign_key',
+					'name' => 'favorite_foreign_key',
 				],
 			)
 			->addIndex(
@@ -64,7 +64,7 @@ class PluginFavorites extends AbstractMigration {
 					'value',
 				],
 				[
-					'name' => 'unique',
+					'name' => 'favorite_unique',
 					'unique' => true,
 				],
 			)
