@@ -36,7 +36,7 @@ There are many implementations in modern applications:
 - Reddit Votes
 - Medium Claps
 
-This package so far mainly supports basic and binary favorite per entity in 3 different types:
+This package so far mainly supports basic reactions per entity in 3 different types:
 - **star** (yes/no)
 - **like** (upvote/downvote/none)
 - **favorite** (custom enum list)
