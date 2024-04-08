@@ -55,7 +55,7 @@ class LikeableComponent extends Component {
 	 * @var array<string, mixed>
 	 */
 	protected array $_defaultConfig = [
-		'callback' => 'beforeRender',
+		'on' => 'startup',
 		'userModelClass' => 'Users',
 		'userIdField' => 'id',
 		'useEntity' => false,
@@ -225,6 +225,10 @@ class LikeableComponent extends Component {
 			return null;
 		}
 
+		if ($this->getConfig('on') !== 'startup') {
+			return null;
+		}
+
 		return $this->process();
 	}
 
@@ -243,6 +247,12 @@ class LikeableComponent extends Component {
 				return null;
 			}
 		}
+
+		if ($this->getConfig('on') !== 'beforeRender') {
+			return null;
+		}
+
+		return $this->process();
 	}
 
 	/**

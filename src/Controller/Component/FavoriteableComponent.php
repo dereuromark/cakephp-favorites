@@ -56,7 +56,8 @@ class FavoriteableComponent extends Component {
 	 * @var array<string, mixed>
 	 */
 	protected array $_defaultConfig = [
-		'userIdField' => 'id',
+		'on' => 'startup',
+ 		'userIdField' => 'id',
 	];
 
 	/**
@@ -249,6 +250,10 @@ class FavoriteableComponent extends Component {
 			return null;
 		}
 
+		if ($this->getConfig('on') !== 'startup') {
+			return null;
+		}
+
 		return $this->process();
 	}
 
@@ -267,6 +272,12 @@ class FavoriteableComponent extends Component {
 				return null;
 			}
 		}
+
+		if ($this->getConfig('on') !== 'beforeRender') {
+			return null;
+		}
+
+		return $this->process();
 
 		//TODO
 		/*
@@ -295,7 +306,7 @@ class FavoriteableComponent extends Component {
 		if ($this->getConfig('useEntity')) {
 			$modelId = $entity->get('id');
 		} else {
-			$modelId = $data['id'];
+			$modelId = $data['id'] ?? null;
 		}
 
 		$options = [
