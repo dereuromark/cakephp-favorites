@@ -83,16 +83,6 @@ Cache::setConfig($cache);
 class_alias(AppController::class, 'App\Controller\AppController');
 class_alias(AppView::class, 'App\View\AppView');
 
-Configure::write('App', [
-	'namespace' => 'TestApp',
-	'encoding' => 'UTF-8',
-	'paths' => [
-		'templates' => [
-			PLUGIN_ROOT . DS . 'tests' . DS . 'test_app' . DS . 'templates' . DS,
-		],
-	],
-]);
-
 Plugin::getCollection()->add(new FavoritesPlugin());
 
 Router::defaultRouteClass(\Cake\Routing\Route\DashedRoute::class);
