@@ -94,9 +94,9 @@ class StarableBehavior extends Behavior {
 			'foreignKey' => 'foreign_key',
 		]);
 
-		if (!empty($config['userModelConfig'])) {
-			$this->favoritesTable()->belongsTo($config['userModelAlias'], $config['userModelConfig']);
-		} else {
+		if ($this->getConfig('userModelConfig') && !$this->favoritesTable()->hasAssociation($this->getConfig('userModel'))) {
+			$this->favoritesTable()->belongsTo($this->getConfig('userModel'), $this->getConfig('userModelConfig'));
+		} elseif (!$this->favoritesTable()->hasAssociation($this->getConfig('userModel'))) {
 			$userConfig = [
 				'className' => $this->getConfig('userModelClass'),
 				'foreignKey' => 'user_id',

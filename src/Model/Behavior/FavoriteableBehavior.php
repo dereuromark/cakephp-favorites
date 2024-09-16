@@ -83,14 +83,14 @@ class FavoriteableBehavior extends Behavior {
 			'foreignKey' => 'foreign_key',
 		]);
 
-		if (!empty($config['userModelConfig']) && is_array($config['userModelConfig'])) {
+		if ($this->getConfig('userModelConfig') && !$this->favoritesTable()->hasAssociation($this->getConfig('userModel'))) {
 			$this->favoritesTable()->belongsTo($config['userModel'], $config['userModelConfig']);
-		} else {
+		} elseif (!$this->favoritesTable()->hasAssociation($this->getConfig('userModel'))) {
 			$userConfig = [
 				'className' => $this->getConfig('userModelClass'),
 				'foreignKey' => 'user_id',
 			];
-			$this->favoritesTable()->belongsTo($this->getConfig('userModelClass'), $userConfig);
+			$this->favoritesTable()->belongsTo($this->getConfig('userModel'), $userConfig);
 		}
 	}
 

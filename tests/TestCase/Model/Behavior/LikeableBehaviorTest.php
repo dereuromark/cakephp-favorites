@@ -40,6 +40,7 @@ class LikeableBehaviorTest extends TestCase {
 	 * @return void
 	 */
 	protected function tearDown(): void {
+		$this->table->removeBehavior('Likeable');
 		unset($this->table);
 
 		parent::tearDown();

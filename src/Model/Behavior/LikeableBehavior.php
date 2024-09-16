@@ -77,9 +77,9 @@ class LikeableBehavior extends Behavior {
 			]);
 		}
 
-		if (!empty($config['userModelConfig']) && is_array($config['userModelConfig'])) {
-			$this->favoritesTable()->belongsTo($config['userModel'], $config['userModelConfig']);
-		} else {
+		if ($this->getConfig('userModelConfig') && !$this->favoritesTable()->hasAssociation($this->getConfig('userModel'))) {
+			$this->favoritesTable()->belongsTo($this->getConfig('userModel'), $this->getConfig('userModelConfig'));
+		} elseif (!$this->favoritesTable()->hasAssociation($this->getConfig('userModel'))) {
 			$userConfig = [
 				'className' => $this->getConfig('userModelClass'),
 				'foreignKey' => 'user_id',
