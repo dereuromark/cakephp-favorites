@@ -33,7 +33,7 @@
 		"cakephp/migrations": "^4.0.1",
 		"dereuromark/cakephp-tinyauth": "^4.1.0",
 		"fig-r/psr2r-sniffer": "dev-master",
-		"phpunit/phpunit": "^10.5 || ^11.5"
+		"phpunit/phpunit": "^10.5 || ^11.5 || ^12.1"
 	},
 	"autoload": {
 		"psr-4": {
