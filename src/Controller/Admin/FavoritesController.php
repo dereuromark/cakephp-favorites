@@ -27,7 +27,7 @@ class FavoritesController extends AppController {
 			->select(['model', 'count' => $this->Favorites->find()->func()->count('*')])
 			->where(['model IS NOT' => null])
 			->groupBy('model')
-			->find('list', ['keyField' => 'model', 'valueField' => 'count'])
+			->find('list', ...['keyField' => 'model', 'valueField' => 'count'])
 			->toArray();
 
 		$this->set(compact('models'));
