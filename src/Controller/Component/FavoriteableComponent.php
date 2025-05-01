@@ -262,22 +262,22 @@ class FavoriteableComponent extends Component {
 	 *
 	 * @param \Cake\Event\EventInterface $event
 	 *
-	 * @return \Cake\Http\Response|null|void
+	 * @return void
 	 */
-	public function beforeRender(EventInterface $event) {
+	public function beforeRender(EventInterface $event): void {
 		$actions = $this->getConfig('actions');
 		if ($actions) {
 			$action = $this->Controller->getRequest()->getParam('action') ?: '';
 			if (!in_array($action, $actions, true)) {
-				return null;
+				return;
 			}
 		}
 
 		if ($this->getConfig('on') !== 'beforeRender') {
-			return null;
+			return;
 		}
 
-		return $this->process();
+		$event->setResult($this->process());
 
 		//TODO
 		/*
