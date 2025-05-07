@@ -210,26 +210,29 @@ class StarableComponent extends Component {
 	 *
 	 * @param \Cake\Event\EventInterface $event
 	 *
-	 * @return \Cake\Http\Response|null|void
+	 * @return void
 	 */
-	public function startup(EventInterface $event) {
+	public function startup(EventInterface $event): void {
 		$actions = $this->getConfig('actions');
 		if ($actions) {
 			$action = $this->Controller->getRequest()->getParam('action') ?: '';
 			if (!in_array($action, $actions, true)) {
-				return null;
+				return;
 			}
 		}
 
 		if (!$this->Controller->getRequest()->is(['post', 'put', 'patch'])) {
-			return null;
+			return;
 		}
 
 		if ($this->getConfig('on') !== 'startup') {
-			return null;
+			return;
 		}
 
-		return $this->process();
+		$result = $this->process();
+		if ($result !== null) {
+			$event->setResult($result);
+		}
 	}
 
 	/**
