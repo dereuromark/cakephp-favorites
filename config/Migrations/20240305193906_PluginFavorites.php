@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use Migrations\BaseMigration;
 
-class PluginFavorites extends AbstractMigration {
+class PluginFavorites extends BaseMigration {
 
 	/**
 	 * Change Method.
