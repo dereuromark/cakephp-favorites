@@ -83,9 +83,11 @@ class StarableBehavior extends Behavior {
 		if ($this->getConfig('counterCache')) {
 			$this->favoritesTable()->addBehavior('CounterCache', [
 				$this->_table->getAlias() => [
-			$this->getConfig('fieldCounter') => [
-					'conditions' => ['Favorites.model' => $this->getConfig('model')],
-				]],
+					$this->getConfig('fieldCounter') => [
+						'conditions' => ['Favorites.model' => $this->getConfig('model')],
+					],
+
+				],
 			]);
 		}
 
