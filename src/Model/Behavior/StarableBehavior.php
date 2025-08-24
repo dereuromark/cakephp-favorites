@@ -86,7 +86,6 @@ class StarableBehavior extends Behavior {
 					$this->getConfig('fieldCounter') => [
 						'conditions' => ['Favorites.model' => $this->getConfig('model')],
 					],
-
 				],
 			]);
 		}
