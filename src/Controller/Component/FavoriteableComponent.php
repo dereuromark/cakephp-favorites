@@ -57,7 +57,7 @@ class FavoriteableComponent extends Component {
 	 */
 	protected array $_defaultConfig = [
 		'on' => 'startup',
- 		'userIdField' => 'id',
+		'userIdField' => 'id',
 	];
 
 	/**
