@@ -4,7 +4,6 @@ namespace Favorites\Model\Behavior;
 
 use Cake\Core\Configure;
 use Cake\ORM\Behavior;
-use Cake\ORM\Query;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
@@ -139,7 +138,7 @@ class FavoriteableBehavior extends Behavior {
 	 */
 	public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
 		return $query->contain([
-			'Favorites' => function (Query $q) use ($options) {
+			'Favorites' => function (SelectQuery $q) use ($options) {
 				$q->contain('Users');
 				$q->where(['foreign_key' => $options['id']]);
 
