@@ -7,10 +7,13 @@ use Cake\Core\Configure;
 use Cake\Core\Plugin;
 use Cake\Database\Connection;
 use Cake\Datasource\ConnectionManager;
+use Cake\Routing\Route\DashedRoute;
 use Cake\Routing\Router;
 use Cake\TestSuite\Fixture\SchemaLoader;
 use Favorites\FavoritesPlugin;
 use TestApp\Controller\AppController;
+use TestApp\Model\Entity\User;
+use TestApp\Model\Table\UsersTable;
 use TestApp\View\AppView;
 
 if (!defined('DS')) {
@@ -85,7 +88,7 @@ class_alias(AppView::class, 'App\View\AppView');
 
 Plugin::getCollection()->add(new FavoritesPlugin());
 
-Router::defaultRouteClass(\Cake\Routing\Route\DashedRoute::class);
+Router::defaultRouteClass(DashedRoute::class);
 Chronos::setTestNow(Chronos::now());
 
 if (!getenv('DB_URL')) {
@@ -111,5 +114,5 @@ if (env('FIXTURE_SCHEMA_METADATA')) {
 	$loader->loadInternalFile(env('FIXTURE_SCHEMA_METADATA'));
 }
 
-class_alias(\TestApp\Model\Entity\User::class, 'App\Model\Entity\User');
-class_alias(\TestApp\Model\Table\UsersTable::class, 'App\Model\Table\UsersTable');
+class_alias(User::class, 'App\Model\Entity\User');
+class_alias(UsersTable::class, 'App\Model\Table\UsersTable');
