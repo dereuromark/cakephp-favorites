@@ -58,6 +58,7 @@ class FavoriteableComponent extends Component {
 	protected array $_defaultConfig = [
 		'on' => 'startup',
 		'userIdField' => 'id',
+		'sessionKey' => null, // Defaults to 'Auth.User', use 'Auth' for CakeDC/Users
 	];
 
 	/**
@@ -333,8 +334,9 @@ class FavoriteableComponent extends Component {
 	 */
 	protected function userId() {
 		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
+		$sessionKey = $this->getConfig('sessionKey') ?? Configure::read('Favorites.sessionKey') ?? 'Auth.User';
 
-		$uid = Configure::read('Auth.User.' . $userIdField);
+		$uid = Configure::read($sessionKey . '.' . $userIdField);
 		if ($uid) {
 			return $uid;
 		}
@@ -345,7 +347,7 @@ class FavoriteableComponent extends Component {
 		} elseif (!$userId && $this->Controller->components()->has('Auth')) {
 			$userId = $this->Controller->Auth->user($userIdField);
 		} elseif (!$userId) {
-			$userId = $this->Controller->getRequest()->getSession()->read('Auth.User.' . $userIdField);
+			$userId = $this->Controller->getRequest()->getSession()->read($sessionKey . '.' . $userIdField);
 		}
 
 		return $userId;
