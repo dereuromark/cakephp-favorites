@@ -14,8 +14,9 @@ trait AuthTrait {
 	 */
 	protected function userId(): ?int {
 		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
+		$sessionKey = Configure::read('Favorites.sessionKey') ?? 'Auth.User';
 
-		$uid = Configure::read('Auth.User.' . $userIdField);
+		$uid = Configure::read($sessionKey . '.' . $userIdField);
 		if ($uid) {
 			return $uid;
 		}
@@ -26,7 +27,7 @@ trait AuthTrait {
 			return $view->AuthUser->user($userIdField);
 		}
 
-		return $view->getRequest()->getSession()->read('Auth.User.' . $userIdField);
+		return $view->getRequest()->getSession()->read($sessionKey . '.' . $userIdField);
 	}
 
 }
