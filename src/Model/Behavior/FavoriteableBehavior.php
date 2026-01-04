@@ -8,6 +8,30 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
 
+/**
+ * FavoriteableBehavior - Adds favorites functionality to any model.
+ *
+ * Allows users to mark records as favorites. Attach this behavior to any model
+ * that should be favoriteable by users.
+ *
+ * Usage:
+ * ```php
+ * // In your Table class
+ * $this->addBehavior('Favorites.Favoriteable');
+ *
+ * // Add a favorite
+ * $this->Articles->addFavorite(['modelId' => $articleId, 'userId' => $userId]);
+ *
+ * // Remove a favorite
+ * $this->Articles->removeFavorite(['modelId' => $articleId, 'userId' => $userId]);
+ *
+ * // Find with favorites
+ * $this->Articles->find('favorites', id: $articleId);
+ * ```
+ *
+ * @author Mark Scherer
+ * @license MIT
+ */
 class FavoriteableBehavior extends Behavior {
 
 	/**
