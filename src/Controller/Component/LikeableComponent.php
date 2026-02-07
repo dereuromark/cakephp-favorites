@@ -283,14 +283,14 @@ class LikeableComponent extends Component {
 		];
 		$action = $this->action($data['action']);
 
-		/** @var \Favorites\Model\Behavior\LikeableBehavior $table */
-		$table = $this->Controller->{$this->modelAlias};
 		/**
 		 * @uses \Favorites\Model\Behavior\LikeableBehavior::addLike()
 		 * @uses \Favorites\Model\Behavior\LikeableBehavior::addDislike()
 		 * @uses \Favorites\Model\Behavior\LikeableBehavior::remove()
 		 */
-		$result = $table->$action($options);
+		/** @var \Favorites\Model\Behavior\LikeableBehavior $behavior */
+		$behavior = $this->Controller->{$this->modelAlias}->getBehavior('Likeable');
+		$result = $behavior->$action($options);
 		if ($result === null) {
 			$this->Flash->error(__d('favorites', 'An error occurred.'));
 		}

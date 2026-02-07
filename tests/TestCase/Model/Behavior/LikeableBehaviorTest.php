@@ -54,7 +54,9 @@ class LikeableBehaviorTest extends TestCase {
 			'modelId' => 1,
 			'userId' => 1,
 		];
-		$result = $this->table->addLike($options);
+		/** @var \Favorites\Model\Behavior\LikeableBehavior $behavior */
+		$behavior = $this->table->getBehavior('Likeable');
+		$result = $behavior->addLike($options);
 
 		/** @var \Favorites\Model\Entity\Favorite $favorite */
 		$favorite = $this->table->Favorites->get($result);
@@ -73,7 +75,9 @@ class LikeableBehaviorTest extends TestCase {
 			'modelId' => 1,
 			'userId' => 1,
 		];
-		$result = $this->table->addDislike($options);
+		/** @var \Favorites\Model\Behavior\LikeableBehavior $behavior */
+		$behavior = $this->table->getBehavior('Likeable');
+		$result = $behavior->addDislike($options);
 
 		/** @var \Favorites\Model\Entity\Favorite $favorite */
 		$favorite = $this->table->Favorites->get($result);

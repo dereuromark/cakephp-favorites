@@ -54,7 +54,9 @@ class FavoriteableBehaviorTest extends TestCase {
 			'modelId' => 1,
 			'userId' => 1,
 		];
-		$result = $this->table->addFavorite($options);
+		/** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
+		$behavior = $this->table->getBehavior('Favoriteable');
+		$result = $behavior->addFavorite($options);
 
 		/** @var \Favorites\Model\Entity\Favorite $favorite */
 		$favorite = $this->table->Favorites->get($result);
@@ -73,7 +75,9 @@ class FavoriteableBehaviorTest extends TestCase {
 			'modelId' => 1,
 			'userId' => 1,
 		];
-		$result = $this->table->removeFavorite($options);
+		/** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
+		$behavior = $this->table->getBehavior('Favoriteable');
+		$result = $behavior->removeFavorite($options);
 		$this->assertSame(1, $result);
 
 		$favorites = $this->table->Favorites->find()->all()->toArray();

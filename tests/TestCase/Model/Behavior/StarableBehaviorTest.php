@@ -53,7 +53,9 @@ class StarableBehaviorTest extends TestCase {
 			'modelId' => 1,
 			'userId' => 1,
 		];
-		$result = $this->table->addStar($options);
+		/** @var \Favorites\Model\Behavior\StarableBehavior $behavior */
+		$behavior = $this->table->getBehavior('Starable');
+		$result = $behavior->addStar($options);
 
 		/** @var \Favorites\Model\Entity\Favorite $favorite */
 		$favorite = $this->table->Favorites->get($result);
@@ -72,7 +74,9 @@ class StarableBehaviorTest extends TestCase {
 			'modelId' => 1,
 			'userId' => 1,
 		];
-		$result = $this->table->removeStar($options);
+		/** @var \Favorites\Model\Behavior\StarableBehavior $behavior */
+		$behavior = $this->table->getBehavior('Starable');
+		$result = $behavior->removeStar($options);
 		$this->assertSame(1, $result);
 
 		$favorites = $this->table->Favorites->find()->all()->toArray();

@@ -321,7 +321,9 @@ class FavoriteableComponent extends Component {
 		];
 		$action = $data['action'] === 'remove' ? 'removeFavorite' : 'addFavorite';
 
-		$result = $this->Controller->{$this->modelAlias}->$action($options);
+		/** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
+		$behavior = $this->Controller->{$this->modelAlias}->getBehavior('Favoriteable');
+		$result = $behavior->$action($options);
 		if ($result === null) {
 			$this->Flash->error(__d('favorites', 'An error occurred.'));
 		}
@@ -434,7 +436,9 @@ class FavoriteableComponent extends Component {
 				'modelId' => $modelId,
 				'modelName' => $modelName,
 			];
-			$result = $this->Controller->{$this->modelAlias}->addFavorite($options);
+			/** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
+			$behavior = $this->Controller->{$this->modelAlias}->getBehavior('Favoriteable');
+			$result = $behavior->addFavorite($options);
 
 			if ($result !== null) {
 				if ($result) {
