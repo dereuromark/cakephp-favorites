@@ -295,13 +295,13 @@ class StarableComponent extends Component {
 		];
 		$action = $data['action'] === 'unstar' ? 'removeStar' : 'addStar';
 
-		/** @var \Favorites\Model\Behavior\StarableBehavior $table */
-		$table = $this->Controller->{$this->modelAlias};
 		/**
 		 * @uses \Favorites\Model\Behavior\StarableBehavior::addStar()
 		 * @uses \Favorites\Model\Behavior\StarableBehavior::removeStar()
 		 */
-		$result = $table->$action($options);
+		/** @var \Favorites\Model\Behavior\StarableBehavior $behavior */
+		$behavior = $this->Controller->{$this->modelAlias}->getBehavior('Starable');
+		$result = $behavior->$action($options);
 		if ($result === null) {
 			$this->Flash->error(__d('favorites', 'An error occurred.'));
 		}

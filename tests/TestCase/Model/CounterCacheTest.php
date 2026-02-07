@@ -54,13 +54,15 @@ class CounterCacheTest extends TestCase {
 
 		$post = $this->table->find()->firstOrFail();
 
-		$this->table->addStar(['modelId' => $post->id, 'userId' => 1]);
+		/** @var \Favorites\Model\Behavior\StarableBehavior $behavior */
+		$behavior = $this->table->getBehavior('Starable');
+		$behavior->addStar(['modelId' => $post->id, 'userId' => 1]);
 
 		$user = $this->getTableLocator()->get('Users')->newEntity([
 			'name' => '2nd',
 		]);
 		$this->getTableLocator()->get('Users')->saveOrFail($user);
-		$this->table->addStar(['modelId' => $post->id, 'userId' => $user->id]);
+		$behavior->addStar(['modelId' => $post->id, 'userId' => $user->id]);
 
 		$post = $this->table->find()
 			->find('starred')
