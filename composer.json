@@ -1,11 +1,14 @@
 {
 	"name": "dereuromark/cakephp-favorites",
-	"description": "CakePHP Favorites Plugin",
+	"description": "A CakePHP plugin for managing user favorites, bookmarks and wishlists",
 	"type": "cakephp-plugin",
 	"keywords": [
 		"cakephp",
 		"plugin",
-		"favorites"
+		"favorites",
+		"bookmarks",
+		"wishlist",
+		"stars"
 	],
 	"homepage": "https://github.com/dereuromark/cakephp-favorites/",
 	"license": "MIT",
