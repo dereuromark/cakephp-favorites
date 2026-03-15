@@ -10,3 +10,4 @@
 /.idea/
 /.phpstorm.meta.php
 /config/Migrations/schema-dump-default.lock
+.phpcs.cache
