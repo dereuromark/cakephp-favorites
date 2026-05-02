@@ -6,6 +6,7 @@ use App\Controller\AppController;
 use Cake\Core\Configure;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
+use Cake\Http\Response;
 use TinyAuth\Controller\Component\AuthComponent;
 use TinyAuth\Controller\Component\AuthUserComponent;
 
@@ -39,7 +40,7 @@ class StarsController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function star($alias = null, $id = null) {
+	public function star(?string $alias = null, ?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -68,7 +69,7 @@ class StarsController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function unstar($alias = null, $id = null) {
+	public function unstar(?string $alias = null, ?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -93,7 +94,7 @@ class StarsController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function delete($id = null) {
+	public function delete(?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$id = $this->request->getData('id') ?: $id;

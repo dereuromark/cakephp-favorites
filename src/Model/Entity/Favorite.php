@@ -16,17 +16,25 @@ use Cake\ORM\Entity;
 class Favorite extends Entity {
 
 	/**
-	 * Fields that can be mass assigned using newEntity() or patchEntity().
+	 * Fields that can be mass assigned via patchEntity() / newEntity().
 	 *
-	 * Note that when '*' is set to true, this allows all unspecified fields to
-	 * be mass assigned. For security purposes, it is advised to set '*' to false
-	 * (or remove it), and explicitly make individual fields accessible as needed.
+	 * Foreign keys (`user_id`, `model`, `foreign_key`) and `created` are explicitly NOT
+	 * mass-assignable — letting them through would allow a host application that ever exposes
+	 * a Favorite-shaped CRUD endpoint, fixture factory, or admin form to forge favorites on
+	 * behalf of any user against any record (privilege-escalation primitive — Issue #2).
+	 *
+	 * Only the user's actual choice (`value`) is mass-assignable; the rest must be set
+	 * server-side via `FavoritesTable::add($model, $foreignKey, $userId, $value)`.
 	 *
 	 * @var array<string, bool>
 	 */
 	protected array $_accessible = [
-		'*' => true,
+		'value' => true,
 		'id' => false,
+		'user_id' => false,
+		'model' => false,
+		'foreign_key' => false,
+		'created' => false,
 	];
 
 }

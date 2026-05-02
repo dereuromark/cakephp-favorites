@@ -41,6 +41,7 @@ use BadMethodCallException;
 use Cake\Controller\Component;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Utility\Inflector;
 
@@ -282,18 +283,28 @@ class StarableComponent extends Component {
 		/** @var \Cake\Datasource\EntityInterface $entity */
 		$entity = $this->Controller->viewBuilder()->getVar($this->viewVariable);
 
+		// Validate the request shape up front (Issue #5).
+		$alias = $data['alias'] ?? null;
+		$actionName = $data['action'] ?? null;
+		if (!is_string($alias) || !is_string($actionName)) {
+			throw new BadRequestException('Missing favorite payload');
+		}
+
 		if ($this->getConfig('useEntity')) {
 			$modelId = $entity->get('id');
 		} else {
-			$modelId = $data['id'];
+			$modelId = $data['id'] ?? null;
+			if (!$modelId) {
+				throw new BadRequestException('Missing favorite payload');
+			}
 		}
 
 		$options = [
 			'userId' => $this->userId(),
 			'modelId' => $modelId,
-			'model' => $data['alias'],
+			'model' => $alias,
 		];
-		$action = $data['action'] === 'unstar' ? 'removeStar' : 'addStar';
+		$action = $actionName === 'unstar' ? 'removeStar' : 'addStar';
 
 		/**
 		 * @uses \Favorites\Model\Behavior\StarableBehavior::addStar()

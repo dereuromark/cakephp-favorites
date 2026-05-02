@@ -41,6 +41,7 @@ use BadMethodCallException;
 use Cake\Controller\Component;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Utility\Inflector;
 use RuntimeException;
@@ -307,19 +308,30 @@ class FavoriteableComponent extends Component {
 		/** @var \Cake\Datasource\EntityInterface $entity */
 		$entity = $this->Controller->viewBuilder()->getVar($this->viewVariable);
 
+		// Validate the request shape up front (Issue #5). `alias` and `action` are required.
+		$alias = $data['alias'] ?? null;
+		$actionName = $data['action'] ?? null;
+		if (!is_string($alias) || !is_string($actionName)) {
+			throw new BadRequestException('Missing favorite payload');
+		}
+
 		if ($this->getConfig('useEntity')) {
 			$modelId = $entity->get('id');
 		} else {
 			$modelId = $data['id'] ?? null;
+			if (!$modelId) {
+				throw new BadRequestException('Missing favorite payload');
+			}
 		}
 
+		$rawValue = $data['value'] ?? null;
 		$options = [
 			'userId' => $this->userId(),
 			'modelId' => $modelId,
-			'model' => $data['alias'],
-			'value' => $data['value'] !== null ? (int)$data['value'] : null,
+			'model' => $alias,
+			'value' => $rawValue !== null ? (int)$rawValue : null,
 		];
-		$action = $data['action'] === 'remove' ? 'removeFavorite' : 'addFavorite';
+		$action = $actionName === 'remove' ? 'removeFavorite' : 'addFavorite';
 
 		/** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
 		$behavior = $this->Controller->{$this->modelAlias}->getBehavior('Favoriteable');
@@ -484,10 +496,19 @@ class FavoriteableComponent extends Component {
 	 * @return void
 	 */
 	public function callbackToggle($modelId, $favoriteId) {
-		if (
-			!isset($this->Controller->passedArgs['favorite_action'])
-			|| !($this->Controller->passedArgs['favorite_action'] == 'toggle_approve' && $this->Controller->Auth->user('is_admin') == true)
-		) {
+		// Modernised admin gate (Issue #6): `passedArgs` is the deprecated CakePHP 2.x property
+		// and is not populated on Cake 5 controllers; reading it would raise an undefined
+		// property notice. Use the typed request accessors and strict comparisons so
+		// non-bool truthy values from custom auth backends (`'admin'`, `'true'`, ...)
+		// can't slip past as `is_admin == true`.
+		$action = (string)$this->Controller->getRequest()->getQuery('favorite_action', '');
+		$user = $this->Controller->Auth ?? null;
+		$isAdmin = false;
+		if ($user !== null) {
+			$flag = $user->user('is_admin');
+			$isAdmin = $flag === true || $flag === 1 || $flag === '1';
+		}
+		if ($action !== 'toggle_approve' || !$isAdmin) {
 			throw new MethodNotAllowedException(__d('favorites', 'Nonrestricted operation'));
 		}
 		if ($this->Controller->{$this->modelAlias}->favoriteToggle($favoriteId)) {

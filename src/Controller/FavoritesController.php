@@ -6,6 +6,7 @@ use App\Controller\AppController;
 use Cake\Core\Configure;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
+use Cake\Http\Response;
 use InvalidArgumentException;
 use TinyAuth\Controller\Component\AuthComponent;
 use TinyAuth\Controller\Component\AuthUserComponent;
@@ -40,7 +41,7 @@ class FavoritesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function add($alias = null, $id = null) {
+	public function add(?string $alias = null, ?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -77,7 +78,7 @@ class FavoritesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function remove($alias = null, $id = null) {
+	public function remove(?string $alias = null, ?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -102,7 +103,7 @@ class FavoritesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function delete($id = null) {
+	public function delete(?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$id = $this->request->getData('id') ?: $id;
