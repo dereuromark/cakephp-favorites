@@ -6,6 +6,7 @@ use App\Controller\AppController;
 use Cake\Core\Configure;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
+use Cake\Http\Response;
 use TinyAuth\Controller\Component\AuthComponent;
 use TinyAuth\Controller\Component\AuthUserComponent;
 
@@ -39,7 +40,7 @@ class LikesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function like($alias = null, $id = null) {
+	public function like(?string $alias = null, ?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -68,7 +69,7 @@ class LikesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function dislike($alias = null, $id = null) {
+	public function dislike(?string $alias = null, ?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -84,7 +85,9 @@ class LikesController extends AppController {
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid, -1);
-		if (!$result->isNew()) {
+		// `isNew()` is true for unsaved entities — that IS the failure case (Issue #1).
+		// Flash an error only when persistence actually didn't happen.
+		if ($result->isNew()) {
 			$this->Flash->error(__d('favorites', 'Could not save dislike, please try again.'));
 		}
 
@@ -97,7 +100,7 @@ class LikesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function remove($alias = null, $id = null) {
+	public function remove(?string $alias = null, ?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -122,7 +125,7 @@ class LikesController extends AppController {
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function delete($id = null) {
+	public function delete(?int $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$id = $this->request->getData('id') ?: $id;

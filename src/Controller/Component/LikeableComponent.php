@@ -41,6 +41,7 @@ use BadMethodCallException;
 use Cake\Controller\Component;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Utility\Inflector;
 
@@ -270,18 +271,31 @@ class LikeableComponent extends Component {
 		/** @var \Cake\Datasource\EntityInterface $entity */
 		$entity = $this->Controller->viewBuilder()->getVar($this->viewVariable);
 
+		// Validate the request shape up front (Issue #5). Both `id` (when not derived from
+		// the entity), `alias`, and `action` are required; missing keys would otherwise
+		// raise an `Undefined array key` warning on every malformed POST and bubble
+		// `BadMethodCallException` from $this->action().
+		$alias = $data['alias'] ?? null;
+		$actionName = $data['action'] ?? null;
+		if (!is_string($alias) || !is_string($actionName)) {
+			throw new BadRequestException('Missing favorite payload');
+		}
+
 		if ($this->getConfig('useEntity')) {
 			$modelId = $entity->get('id');
 		} else {
-			$modelId = $data['id'];
+			$modelId = $data['id'] ?? null;
+			if (!$modelId) {
+				throw new BadRequestException('Missing favorite payload');
+			}
 		}
 
 		$options = [
 			'userId' => $this->userId(),
 			'modelId' => $modelId,
-			'model' => $data['alias'],
+			'model' => $alias,
 		];
-		$action = $this->action($data['action']);
+		$action = $this->action($actionName);
 
 		/**
 		 * @uses \Favorites\Model\Behavior\LikeableBehavior::addLike()

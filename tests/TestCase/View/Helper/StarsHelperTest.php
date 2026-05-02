@@ -78,12 +78,9 @@ class StarsHelperTest extends TestCase {
 	 */
 	public function testLinkIconStarred(): void {
 		Configure::write('Auth.User.id', 1);
-		$favorite = $this->getTableLocator()->get('Favorites.Favorites')->newEntity([
-			'model' => 'Posts',
-			'foreign_key' => 1,
-			'user_id' => 1,
-		]);
-		$this->getTableLocator()->get('Favorites.Favorites')->saveOrFail($favorite);
+		// Foreign keys on `Favorite` are not mass-assignable (Issue #2); use the
+		// FavoritesTable::add() server-side API instead of newEntity().
+		$this->getTableLocator()->get('Favorites.Favorites')->add('Posts', 1, 1);
 
 		$result = $this->Stars->linkIcon('Posts', 1);
 		$this->assertStringStartsWith('<a href="#" onclick="document.post_', $result);
