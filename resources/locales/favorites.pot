@@ -1,0 +1,121 @@
+# LANGUAGE translation of CakePHP Application
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2026-05-04 03:21+0200\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+msgid "Favorites admin backend is not configured. Set Favorites.adminAccess to a Closure that returns true for permitted callers."
+msgstr ""
+
+msgid "Favorites admin access denied."
+msgstr ""
+
+msgid "The favorites have been reset for `{0}`, deleted: {1}."
+msgstr ""
+
+msgid "The favorite has been deleted."
+msgstr ""
+
+msgid "The favorite could not be deleted. Please, try again."
+msgstr ""
+
+msgid "An error occurred."
+msgstr ""
+
+msgid "The Favorite has been saved."
+msgstr ""
+
+msgid "The Favorite could not be saved. Please, try again."
+msgstr ""
+
+msgid "Nonrestricted operation"
+msgstr ""
+
+msgid "The Favorite status has been updated."
+msgstr ""
+
+msgid "Error appear during favorite status update. Try later."
+msgstr ""
+
+msgid "The Favorite has been deleted."
+msgstr ""
+
+msgid "Error appear during favorite deleting. Try later."
+msgstr ""
+
+msgid "Could not save favorite, please try again."
+msgstr ""
+
+msgid "You are not authorized to remove this favorite."
+msgstr ""
+
+msgid "Could not save like, please try again."
+msgstr ""
+
+msgid "Could not save dislike, please try again."
+msgstr ""
+
+msgid "Remove reaction"
+msgstr ""
+
+msgid "Add reaction"
+msgstr ""
+
+msgid "Reset rating"
+msgstr ""
+
+msgid "Rate me"
+msgstr ""
+
+msgid "Starred by you. Click to unstar."
+msgstr ""
+
+msgid "Click to star."
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Favorites"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Are you sure you want to delete # {0}?"
+msgstr ""
+
+msgid "first"
+msgstr ""
+
+msgid "last"
+msgstr ""
+
+msgid "previous"
+msgstr ""
+
+msgid "next"
+msgstr ""
+
+msgid "Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total"
+msgstr ""
+
