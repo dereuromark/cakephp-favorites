@@ -81,13 +81,13 @@ class FavoritesController extends AppController {
 			$model = $this->request->getQuery('model');
 			// Whitelist against `Favorites.models` — without this, `reset()` happily issues
 			// `DELETE FROM favorites_favorites WHERE model = ''` for unmapped values, and the
-			// query parameter would pollute the i18n cache when concatenated into __() (Issue #3).
+			// query parameter would pollute the i18n cache when concatenated into the translator call.
 			$allowed = array_keys((array)Configure::read('Favorites.models'));
 			if (!is_string($model) || !in_array($model, $allowed, true)) {
 				throw new BadRequestException('Invalid model');
 			}
 			$count = $this->Favorites->reset($model);
-			$this->Flash->success(__('The favorites have been reset for `{0}`, deleted: {1}.', $model, $count));
+			$this->Flash->success(__d('favorites', 'The favorites have been reset for `{0}`, deleted: {1}.', $model, $count));
 
 			return $this->redirect(['action' => 'index']);
 		}
@@ -122,9 +122,9 @@ class FavoritesController extends AppController {
 		$this->request->allowMethod(['post', 'delete']);
 		$favorite = $this->Favorites->get($id);
 		if ($this->Favorites->delete($favorite)) {
-			$this->Flash->success(__('The favorite has been deleted.'));
+			$this->Flash->success(__d('favorites', 'The favorite has been deleted.'));
 		} else {
-			$this->Flash->error(__('The favorite could not be deleted. Please, try again.'));
+			$this->Flash->error(__d('favorites', 'The favorite could not be deleted. Please, try again.'));
 		}
 
 		return $this->redirect(['action' => 'index']);

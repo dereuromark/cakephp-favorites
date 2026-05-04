@@ -7,14 +7,14 @@ $cspNonce = (string)$this->getRequest()->getAttribute('cspNonce', '');
 ?>
 <nav class="actions large-3 medium-4 columns col-sm-4 col-xs-12" id="actions-sidebar">
     <ul class="side-nav nav nav-pills flex-column">
-        <li class="nav-item heading"><?= __('Actions') ?></li>
+        <li class="nav-item heading"><?= __d('favorites', 'Actions') ?></li>
         <li class="nav-item">
         </li>
     </ul>
 </nav>
 <div class="favorites index content large-9 medium-8 columns col-sm-8 col-12">
 
-    <h2><?= __('Favorites') ?></h2>
+    <h2><?= __d('favorites', 'Favorites') ?></h2>
 
     <ul>
 		<?php foreach ($models as $model => $count): ?>
@@ -30,7 +30,7 @@ $cspNonce = (string)$this->getRequest()->getAttribute('cspNonce', '');
 		<?php endforeach; ?>
 	</ul>
 
-	<p><?= $this->Html->link(__('Details'), ['action' => 'listing'], ['class' => '']) ?></p>
+	<p><?= $this->Html->link(__d('favorites', 'Details'), ['action' => 'listing'], ['class' => '']) ?></p>
 
 </div>
 <script<?= $cspNonce !== '' ? ' nonce="' . h($cspNonce) . '"' : '' ?>>
