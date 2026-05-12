@@ -56,7 +56,7 @@ class LikesController extends AppController {
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid, 1);
-		if ($result->isNew()) {
+		if ($result->hasErrors()) {
 			$this->Flash->error(__d('favorites', 'Could not save like, please try again.'));
 		}
 
@@ -85,9 +85,7 @@ class LikesController extends AppController {
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid, -1);
-		// `isNew()` is true for unsaved entities — that IS the failure case (Issue #1).
-		// Flash an error only when persistence actually didn't happen.
-		if ($result->isNew()) {
+		if ($result->hasErrors()) {
 			$this->Flash->error(__d('favorites', 'Could not save dislike, please try again.'));
 		}
 

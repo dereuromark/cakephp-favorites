@@ -71,14 +71,29 @@ class StarableBehavior extends Behavior {
 			'dependent' => true,
 		]);
 
+		// `Starred` is attached unconditionally so admin/list templates can
+		// always `contain('Starred')` and filter the user_id at query time:
+		//
+		//   $articles->find()->contain([
+		//       'Starred' => fn ($q) => $q->where(['Starred.user_id' => $userId]),
+		//   ]);
+		//
+		// When `userId` is supplied at addBehavior() time, the condition is
+		// baked into the association so apps that already rely on that
+		// behavior keep working without code changes. The previous
+		// implementation gated the whole `hasOne` on `userId`, so any
+		// controller that didn't know a user up-front lost the Starred
+		// association entirely.
+		$starredConditions = ['Starred.model' => $this->getConfig('model')];
 		if (!empty($config['userId'])) {
-			$this->_table->hasOne('Starred', [
-				'className' => $this->getConfig('favoriteClass'),
-				'foreignKey' => 'foreign_key',
-				'conditions' => ['Starred.model' => $this->getConfig('model'), 'Starred.user_id' => $config['userId']],
-				'dependent' => true,
-			]);
+			$starredConditions['Starred.user_id'] = $config['userId'];
 		}
+		$this->_table->hasOne('Starred', [
+			'className' => $this->getConfig('favoriteClass'),
+			'foreignKey' => 'foreign_key',
+			'conditions' => $starredConditions,
+			'dependent' => true,
+		]);
 
 		if ($this->getConfig('counterCache')) {
 			$this->favoritesTable()->addBehavior('CounterCache', [
