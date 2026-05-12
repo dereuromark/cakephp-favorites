@@ -36,6 +36,7 @@ class LikesControllerTest extends TestCase {
 	 */
 	public function testLike(): void {
 		$this->disableErrorHandlerMiddleware();
+		$this->enableRetainFlashMessages();
 
 		Configure::write('Favorites.models.Posts', 'Posts');
 
@@ -50,6 +51,27 @@ class LikesControllerTest extends TestCase {
 		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Posts', 1]);
 
 		$this->assertRedirect(['action' => 'index']);
+
+		// Regression: prior code used `$result->isNew()` to detect failure,
+		// but `findOrCreate` + `saveOrFail` always returns a non-new entity
+		// — so on the success path the error message NEVER fires (correct
+		// for the success case but means the error branch was unreachable
+		// for the actual failure case). The hasErrors() switch makes the
+		// guard meaningful again. Either way, a successful POST must
+		// land a row and not leave a stale error flash sitting in session.
+		$row = $this->fetchTable('Favorites.Favorites')->find()
+			->where(['model' => 'Posts', 'foreign_key' => 1, 'user_id' => 1, 'value' => 1])
+			->first();
+		$this->assertNotNull($row, 'A like row must have landed in the DB.');
+
+		$flash = $this->_requestSession->read('Flash.flash') ?? [];
+		foreach ($flash as $message) {
+			$this->assertNotSame(
+				__d('favorites', 'Could not save like, please try again.'),
+				$message['message'] ?? null,
+				'A successful like must not flash a "could not save" error.',
+			);
+		}
 
 		Configure::delete('Favorites.models');
 	}

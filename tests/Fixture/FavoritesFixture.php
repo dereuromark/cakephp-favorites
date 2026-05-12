@@ -33,6 +33,10 @@ class FavoritesFixture extends TestFixture {
 		],
 		'_constraints' => [
 			'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
+			// Matches the tightened constraint from
+			// 20260513000000_TightenFavoriteUniqueIndex: a single user
+			// gets exactly one favorite row per (model, foreign_key).
+			'favorite_unique' => ['type' => 'unique', 'columns' => ['model', 'foreign_key', 'user_id'], 'length' => []],
 		],
 	];
 

@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Favorites\Test\TestCase\Model\Table;
 
+use Cake\Database\Exception\DatabaseException;
 use Cake\TestSuite\TestCase;
 use Favorites\Model\Table\FavoritesTable;
+use PDOException;
 
 /**
  * Favorites\Model\Table\FavoritesTable Test Case
@@ -85,6 +87,43 @@ class FavoritesTableTest extends TestCase {
 
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(1, $favorites);
+	}
+
+	/**
+	 * Regression for the tightened unique index. The application path
+	 * (`FavoritesTable::add()`) already uses `findOrCreate` so it
+	 * doesn't accidentally duplicate, but the DB-level constraint
+	 * previously allowed duplicate `(model, foreign_key, user_id)`
+	 * rows as long as `value` differed. Any direct INSERT — a custom
+	 * import, a race between two `findOrCreate` calls, or a future
+	 * `newEntity()` + `save()` path — would land both rows.
+	 *
+	 * @return void
+	 */
+	public function testUniqueIndexPreventsDuplicatePerUserPerRecord(): void {
+		// Wipe the fixture row so the asserts measure the constraint, not it.
+		$this->Favorites->deleteAll(['1=1']);
+
+		// Build directly via set(guard=false) — the entity's `_accessible`
+		// allowlist blocks mass-assign of identity columns by design
+		// (those are set server-side via FavoritesTable::add).
+		$first = $this->Favorites->newEmptyEntity();
+		$first->patch(['model' => 'Posts', 'foreign_key' => 1, 'user_id' => 1, 'value' => 1], ['guard' => false]);
+		$this->Favorites->saveOrFail($first);
+
+		$second = $this->Favorites->newEmptyEntity();
+		$second->patch(['model' => 'Posts', 'foreign_key' => 1, 'user_id' => 1, 'value' => -1], ['guard' => false]);
+
+		try {
+			$this->Favorites->save($second, ['atomic' => false]);
+			$this->fail('Expected duplicate-key violation on second insert.');
+		} catch (DatabaseException) {
+			// Expected: tightened unique index trips on the second row.
+		} catch (PDOException) {
+			// Some drivers wrap as PDOException — also acceptable.
+		}
+
+		$this->assertSame(1, $this->Favorites->find()->count(), 'Only the first row should have landed.');
 	}
 
 	/**

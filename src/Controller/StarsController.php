@@ -56,8 +56,8 @@ class StarsController extends AppController {
 		}
 
 		$result = $this->Favorites->add($model, $entity->get('id'), $uid);
-		if ($result->isNew()) {
-			$this->Flash->error(__d('favorites', 'Could not save like, please try again.'));
+		if ($result->hasErrors()) {
+			$this->Flash->error(__d('favorites', 'Could not save star, please try again.'));
 		}
 
 		return $this->redirect($this->referer(['action' => 'index']));
