@@ -17,7 +17,11 @@ class FavoritesForeignKeySignedness extends BaseMigration {
 	 * @return void
 	 */
 	public function up(): void {
-		$signed = !(bool)Configure::read('Migrations.unsigned_primary_keys');
+		// Match the application's primary-key signedness. The flag is false
+		// (signed primary keys) when unset, so an unset flag yields signed columns,
+		// matching the default-signed ids they reference. Pass the default
+		// explicitly to make that intent unmistakable. (Unsigned only on MySQL.)
+		$signed = !(bool)Configure::read('Migrations.unsigned_primary_keys', false);
 
 		$this->table('favorites_favorites')
 			->changeColumn('foreign_key', 'integer', [
