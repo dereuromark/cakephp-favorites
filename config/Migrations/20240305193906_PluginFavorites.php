@@ -15,18 +15,22 @@ class PluginFavorites extends BaseMigration {
 	 * @return void
 	 */
 	public function change(): void {
-		// foreign_key (polymorphic host record) and user_id reference primary keys,
-		// so they follow the application's primary-key signedness. The flag is false
-		// (signed) when unset, so an unset flag yields signed columns matching the
-		// default-signed ids they reference. Unsigned only on MySQL.
+		// foreign_key (polymorphic host record) follows the Polymorphic.type config so
+		// apps using UUID primary keys can store matching foreign keys. user_id is a
+		// concrete FK to app users and always follows the primary-key signedness.
+		$type = (string)Configure::read('Polymorphic.type', 'integer');
 		$signed = !(bool)Configure::read('Migrations.unsigned_primary_keys', false);
 
+		$polymorphicOptions = [
+			'default' => null,
+			'null' => false,
+		];
+		if (in_array($type, ['integer', 'biginteger'], true)) {
+			$polymorphicOptions['signed'] = $signed;
+		}
+
 		$this->table('favorites_favorites')
-			->addColumn('foreign_key', 'integer', [
-				'default' => null,
-				'null' => false,
-				'signed' => $signed,
-			])
+			->addColumn('foreign_key', $type, $polymorphicOptions)
 			->addColumn('model', 'string', [
 				'default' => null,
 				'limit' => 80,
