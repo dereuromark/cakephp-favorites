@@ -55,6 +55,23 @@ This can be needed, if you want to display a validation result on the form itsel
 - [Like](Like.md)
 - [Favorite](Favorite.md)
 
+## Database Configuration
+
+### Polymorphic foreign key type
+
+The `favorites_favorites.foreign_key` column type is configurable via the global
+`Polymorphic.type` key. This allows apps that use UUID or binary-UUID primary keys
+to store matching foreign keys in the favorites table.
+
+```php
+// config/app.php or config/app_local.php
+Configure::write('Polymorphic.type', 'uuid'); // integer (default) | biginteger | uuid | binaryuuid
+```
+
+For `integer` and `biginteger` types, column signedness follows `Migrations.unsigned_primary_keys`
+(unsigned when `true`, signed otherwise). For `uuid` and `binaryuuid` types, no signedness option
+is applied. The concrete `user_id` column is always `integer` and unaffected by this setting.
+
 ## Admin Backend
 Go to `/admin/favorites`.
 
