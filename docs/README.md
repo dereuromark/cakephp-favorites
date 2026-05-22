@@ -63,10 +63,18 @@ The `favorites_favorites.foreign_key` column type is configurable via the global
 `Polymorphic.type` key. This allows apps that use UUID or binary-UUID primary keys
 to store matching foreign keys in the favorites table.
 
+Set the type in your app config so it is available during bootstrap and migrations:
+
 ```php
-// config/app.php or config/app_local.php
-Configure::write('Polymorphic.type', 'uuid'); // integer (default) | biginteger | uuid | binaryuuid
+// config/app.php (merged into Configure at bootstrap, including the migrations CLI)
+'Polymorphic' => [
+    'type' => 'uuid', // integer (default) | biginteger | uuid | binaryuuid
+],
 ```
+
+This setting applies to fresh installs — the migration uses it when creating the column.
+Existing installs keep their current column type; to change it you need an app-side migration
+that alters the `foreign_key` column to the new type.
 
 For `integer` and `biginteger` types, column signedness follows `Migrations.unsigned_primary_keys`
 (unsigned when `true`, signed otherwise). For `uuid` and `binaryuuid` types, no signedness option
