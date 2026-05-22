@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use Cake\Core\Configure;
 use Migrations\BaseMigration;
 
 class PluginFavorites extends BaseMigration {
@@ -14,11 +15,17 @@ class PluginFavorites extends BaseMigration {
 	 * @return void
 	 */
 	public function change(): void {
+		// foreign_key (polymorphic host record) and user_id reference primary keys,
+		// so they follow the application's primary-key signedness. The flag is false
+		// (signed) when unset, so an unset flag yields signed columns matching the
+		// default-signed ids they reference. Unsigned only on MySQL.
+		$signed = !(bool)Configure::read('Migrations.unsigned_primary_keys', false);
+
 		$this->table('favorites_favorites')
 			->addColumn('foreign_key', 'integer', [
 				'default' => null,
 				'null' => false,
-				'signed' => false,
+				'signed' => $signed,
 			])
 			->addColumn('model', 'string', [
 				'default' => null,
@@ -28,7 +35,7 @@ class PluginFavorites extends BaseMigration {
 			->addColumn('user_id', 'integer', [
 				'default' => null,
 				'null' => false,
-				'signed' => false,
+				'signed' => $signed,
 			])
 			->addColumn('value', 'tinyinteger', [
 				'default' => null,
