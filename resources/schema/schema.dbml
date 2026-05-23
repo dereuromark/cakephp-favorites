@@ -1,0 +1,30 @@
+// cakephp-favorites — database schema snapshot (DBML)
+//
+// A merged snapshot of all plugin migrations under config/Migrations/.
+// Hand-maintained: update it when you add a migration that changes these tables.
+// Paste into https://dbdiagram.io (or any DBML tool) to view/diagram.
+// DBML reference: https://dbml.dbdiagram.io/docs
+//
+// Polymorphic column: foreign_key stores the PK of the associated record.
+// Its type follows the Polymorphic.type config (default: integer). Set
+// Polymorphic.type to biginteger or binaryuuid to change the stored type.
+
+Project cakephp_favorites {
+  database_type: 'Generic'
+  Note: 'Favorites plugin tables only.'
+}
+
+Table favorites_favorites {
+  id integer [pk, increment]
+  foreign_key int [not null, note: 'Polymorphic foreign_key id; set Polymorphic.type to biginteger/uuid/binaryuuid to change']
+  model varchar(80) [not null]
+  user_id int [not null]
+  value tinyint [null]
+  created datetime [not null]
+
+  indexes {
+    user_id [name: 'favorite_user_id']
+    (model, foreign_key) [name: 'favorite_foreign_key']
+    (model, foreign_key, user_id) [unique, name: 'favorite_unique']
+  }
+}
