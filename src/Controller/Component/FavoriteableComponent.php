@@ -237,7 +237,7 @@ class FavoriteableComponent extends Component {
 		$model = $this->Controller->fetchTable();
 		$this->modelAlias = $model->getAlias();
 
-		$parts = explode('\\', (string) $model->getEntityClass());
+		$parts = explode('\\', (string)$model->getEntityClass());
 		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
 		$this->viewVariable = Inflector::variable($entityName);
 		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Favoriteable')) {
@@ -439,19 +439,19 @@ class FavoriteableComponent extends Component {
 	 */
 	public function callbackAdd($modelId, $displayType) {
 		if (!empty($this->Controller->data)) {
-            $modelName = $this->Controller->{$this->modelAlias}->alias;
-            if (!empty($this->Controller->{$this->modelAlias}->fullName)) {
+			$modelName = $this->Controller->{$this->modelAlias}->alias;
+			if (!empty($this->Controller->{$this->modelAlias}->fullName)) {
 				$modelName = $this->Controller->{$this->modelAlias}->fullName;
 			}
-            $options = [
+			$options = [
 				'userId' => $this->userId(),
 				'modelId' => $modelId,
 				'modelName' => $modelName,
 			];
-            /** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
-            $behavior = $this->Controller->{$this->modelAlias}->getBehavior('Favoriteable');
-            $result = $behavior->addFavorite($options);
-            if ($result !== null) {
+			/** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
+			$behavior = $this->Controller->{$this->modelAlias}->getBehavior('Favoriteable');
+			$result = $behavior->addFavorite($options);
+			if ($result !== null) {
 				if ($result) {
 					try {
 						$options['favoriteId'] = $result;
@@ -472,14 +472,14 @@ class FavoriteableComponent extends Component {
 					$this->flash(__d('favorites', 'The Favorite could not be saved. Please, try again.'));
 				}
 			}
-        } elseif (!empty($this->Controller->passedArgs['quote'])) {
-            if (!empty($this->Controller->passedArgs['favorite'])) {
+		} elseif (!empty($this->Controller->passedArgs['quote'])) {
+			if (!empty($this->Controller->passedArgs['favorite'])) {
 					$message = $this->_call('getFormatedFavorite', [$this->Controller->passedArgs['favorite']]);
-					if ($message) {
-						//$this->Controller->request->data['Favorite']['body'] = $message;
-					}
+				if ($message) {
+					//$this->Controller->request->data['Favorite']['body'] = $message;
 				}
-        }
+			}
+		}
 	}
 
 	/**
