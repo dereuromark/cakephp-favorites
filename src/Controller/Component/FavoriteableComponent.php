@@ -474,7 +474,7 @@ class FavoriteableComponent extends Component {
 			}
 		} elseif (!empty($this->Controller->passedArgs['quote'])) {
 			if (!empty($this->Controller->passedArgs['favorite'])) {
-					$message = $this->_call('getFormatedFavorite', [$this->Controller->passedArgs['favorite']]);
+				$message = $this->_call('getFormatedFavorite', [$this->Controller->passedArgs['favorite']]);
 				if ($message) {
 					//$this->Controller->request->data['Favorite']['body'] = $message;
 				}
