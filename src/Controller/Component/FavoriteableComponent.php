@@ -237,7 +237,7 @@ class FavoriteableComponent extends Component {
 		$model = $this->Controller->fetchTable();
 		$this->modelAlias = $model->getAlias();
 
-		$parts = explode('\\', $model->getEntityClass());
+		$parts = explode('\\', (string) $model->getEntityClass());
 		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
 		$this->viewVariable = Inflector::variable($entityName);
 		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Favoriteable')) {
@@ -398,7 +398,7 @@ class FavoriteableComponent extends Component {
 		}
 
 		$id = $entity->get('id');
-		$options = compact('displayType', 'id');
+		$options = ['displayType' => $displayType, 'id' => $id];
 		if ($processActions) {
 			//TODO
 			//$this->_processActions($options);
@@ -406,7 +406,7 @@ class FavoriteableComponent extends Component {
 
 		try {
 			$data = $this->_call('fetchData' . Inflector::camelize($displayType), [$options]);
-		} catch (BadMethodCallException $exception) {
+		} catch (BadMethodCallException) {
 			$data = $this->_call('fetchData', [$options]);
 		}
 
@@ -439,25 +439,24 @@ class FavoriteableComponent extends Component {
 	 */
 	public function callbackAdd($modelId, $displayType) {
 		if (!empty($this->Controller->data)) {
-			$modelName = $this->Controller->{$this->modelAlias}->alias;
-			if (!empty($this->Controller->{$this->modelAlias}->fullName)) {
+            $modelName = $this->Controller->{$this->modelAlias}->alias;
+            if (!empty($this->Controller->{$this->modelAlias}->fullName)) {
 				$modelName = $this->Controller->{$this->modelAlias}->fullName;
 			}
-			$options = [
+            $options = [
 				'userId' => $this->userId(),
 				'modelId' => $modelId,
 				'modelName' => $modelName,
 			];
-			/** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
-			$behavior = $this->Controller->{$this->modelAlias}->getBehavior('Favoriteable');
-			$result = $behavior->addFavorite($options);
-
-			if ($result !== null) {
+            /** @var \Favorites\Model\Behavior\FavoriteableBehavior $behavior */
+            $behavior = $this->Controller->{$this->modelAlias}->getBehavior('Favoriteable');
+            $result = $behavior->addFavorite($options);
+            if ($result !== null) {
 				if ($result) {
 					try {
 						$options['favoriteId'] = $result;
 						$this->_call('afterAdd', [$options]);
-					} catch (BadMethodCallException $exception) {
+					} catch (BadMethodCallException) {
 					}
 					$this->flash(__d('favorites', 'The Favorite has been saved.'));
 					$this->prgRedirect(['#' => 'favorite' . $result]);
@@ -473,16 +472,14 @@ class FavoriteableComponent extends Component {
 					$this->flash(__d('favorites', 'The Favorite could not be saved. Please, try again.'));
 				}
 			}
-		} else {
-			if (!empty($this->Controller->passedArgs['quote'])) {
-				if (!empty($this->Controller->passedArgs['favorite'])) {
+        } elseif (!empty($this->Controller->passedArgs['quote'])) {
+            if (!empty($this->Controller->passedArgs['favorite'])) {
 					$message = $this->_call('getFormatedFavorite', [$this->Controller->passedArgs['favorite']]);
 					if ($message) {
 						//$this->Controller->request->data['Favorite']['body'] = $message;
 					}
 				}
-			}
-		}
+        }
 	}
 
 	/**
@@ -506,7 +503,7 @@ class FavoriteableComponent extends Component {
 		$isAdmin = false;
 		if ($user !== null) {
 			$flag = $user->user('is_admin');
-			$isAdmin = $flag === true || $flag === 1 || $flag === '1';
+			$isAdmin = in_array($flag, [true, 1, '1'], true);
 		}
 		if ($action !== 'toggle_approve' || !$isAdmin) {
 			throw new MethodNotAllowedException(__d('favorites', 'Nonrestricted operation'));

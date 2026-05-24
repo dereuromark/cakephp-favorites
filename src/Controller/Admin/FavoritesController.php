@@ -60,8 +60,6 @@ class FavoritesController extends AppController {
 
 		try {
 			$allowed = $gate($this->request) === true;
-		} catch (ForbiddenException $e) {
-			throw $e;
 		} catch (Throwable $e) {
 			Log::warning(sprintf('Favorites.adminAccess threw %s: %s', $e::class, $e->getMessage()));
 
@@ -99,7 +97,7 @@ class FavoritesController extends AppController {
 			->find('list', ...['keyField' => 'model', 'valueField' => 'count'])
 			->toArray();
 
-		$this->set(compact('models'));
+		$this->set(['models' => $models]);
 	}
 
 	/**
@@ -110,7 +108,7 @@ class FavoritesController extends AppController {
 			->contain(['Users']);
 		$favorites = $this->paginate($query);
 
-		$this->set(compact('favorites'));
+		$this->set(['favorites' => $favorites]);
 	}
 
 	/**

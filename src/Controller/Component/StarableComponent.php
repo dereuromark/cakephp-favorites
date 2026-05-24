@@ -195,7 +195,7 @@ class StarableComponent extends Component {
 		$this->modelName = $model->getRegistryAlias();
 		$this->modelAlias = $model->getAlias();
 
-		$parts = explode('\\', $model->getEntityClass());
+		$parts = explode('\\', (string) $model->getEntityClass());
 		$entityName = Inflector::classify(Inflector::underscore(array_pop($parts)));
 		$this->viewVariable = $this->getConfig('viewVariable') ?? Inflector::variable($entityName);
 		if (!$this->Controller->{$this->modelAlias}->behaviors()->has('Starable')) {
