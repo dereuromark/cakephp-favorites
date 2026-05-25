@@ -640,7 +640,7 @@ class FavoriteableComponent extends Component {
 			} else {
 				//$this->Controller->Session->write('Auth.redirect', $this->Controller->request['url']);
 				$auth = $this->Controller->components()->has('Auth') ? $this->Controller->components()->get('Auth') : null;
-				if ($auth !== null && method_exists($auth, 'getConfig')) {
+				if ($auth !== null) {
 					$this->Controller->redirect($auth->getConfig('loginAction'));
 				}
 			}
