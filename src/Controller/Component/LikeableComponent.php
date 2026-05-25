@@ -340,9 +340,15 @@ class LikeableComponent extends Component {
 
 		$userId = $this->getConfig('userId') ?: null;
 		if (!$userId && $this->Controller->components()->has('AuthUser')) {
-			$userId = $this->Controller->AuthUser->user($userIdField);
+			$authUser = $this->Controller->components()->get('AuthUser');
+			if (method_exists($authUser, 'user')) {
+				$userId = $authUser->user($userIdField);
+			}
 		} elseif (!$userId && $this->Controller->components()->has('Auth')) {
-			$userId = $this->Controller->Auth->user($userIdField);
+			$auth = $this->Controller->components()->get('Auth');
+			if (method_exists($auth, 'user')) {
+				$userId = $auth->user($userIdField);
+			}
 		} elseif (!$userId) {
 			$userId = $this->Controller->getRequest()->getSession()->read($sessionKey . '.' . $userIdField);
 		}

@@ -8,13 +8,9 @@ use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use InvalidArgumentException;
-use TinyAuth\Controller\Component\AuthComponent;
-use TinyAuth\Controller\Component\AuthUserComponent;
 
 /**
  * @property \Favorites\Model\Table\FavoritesTable $Favorites
- * @property \TinyAuth\Controller\Component\AuthUserComponent $AuthUser
- * @property \TinyAuth\Controller\Component\AuthComponent $Auth
  */
 class FavoritesController extends AppController {
 
@@ -28,9 +24,9 @@ class FavoritesController extends AppController {
 	public function initialize(): void {
 		parent::initialize();
 
-		if (class_exists(AuthUserComponent::class)) {
+		if (class_exists('TinyAuth\\Controller\\Component\\AuthUserComponent')) {
 			$this->loadComponent('TinyAuth.AuthUser');
-		} elseif (class_exists(AuthComponent::class)) {
+		} elseif (class_exists('TinyAuth\\Controller\\Component\\AuthComponent')) {
 			$this->loadComponent('TinyAuth.Auth');
 		}
 	}
