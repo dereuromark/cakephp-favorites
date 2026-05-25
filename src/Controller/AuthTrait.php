@@ -22,10 +22,16 @@ trait AuthTrait {
 		}
 
 		if ($this->components()->has('AuthUser')) {
-			return $this->AuthUser->user($userIdField);
+			$authUser = $this->components()->get('AuthUser');
+			if (method_exists($authUser, 'user')) {
+				return $authUser->user($userIdField);
+			}
 		}
 		if ($this->components()->has('Auth')) {
-			return $this->Auth->user($userIdField);
+			$auth = $this->components()->get('Auth');
+			if (method_exists($auth, 'user')) {
+				return $auth->user($userIdField);
+			}
 		}
 
 		return $this->getRequest()->getSession()->read($sessionKey . '.' . $userIdField);
