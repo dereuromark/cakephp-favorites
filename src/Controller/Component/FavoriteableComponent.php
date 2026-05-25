@@ -398,7 +398,7 @@ class FavoriteableComponent extends Component {
 		}
 
 		$id = $entity->get('id');
-		$options = ['displayType' => $displayType, 'id' => $id];
+		$options = compact('displayType', 'id');
 		if ($processActions) {
 			//TODO
 			//$this->_processActions($options);
