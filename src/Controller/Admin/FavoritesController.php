@@ -97,7 +97,7 @@ class FavoritesController extends AppController {
 			->find('list', ...['keyField' => 'model', 'valueField' => 'count'])
 			->toArray();
 
-		$this->set(['models' => $models]);
+		$this->set(compact('models'));
 	}
 
 	/**
@@ -108,7 +108,7 @@ class FavoritesController extends AppController {
 			->contain(['Users']);
 		$favorites = $this->paginate($query);
 
-		$this->set(['favorites' => $favorites]);
+		$this->set(compact('favorites'));
 	}
 
 	/**
