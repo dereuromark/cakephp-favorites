@@ -91,9 +91,8 @@ class LikesHelper extends Helper {
 			$data = $this->data('remove', $alias, $id);
 			$resetIcon = $this->icon($alias, $id, 0);
 			$options = ['escapeTitle' => false, 'block' => true, 'data' => $data];
-			$icon .= ' <details class="like-buttons"><summary>' . __d('favorites', 'Reset rating') . '</summary>' . $this->Form->postLink($resetIcon, $url, $options) . '</details>';
 
-			return $icon;
+			return $icon . (' <details class="like-buttons"><summary>' . __d('favorites', 'Reset rating') . '</summary>' . $this->Form->postLink($resetIcon, $url, $options) . '</details>');
 		}
 
 		$likeIcon = $this->icon($alias, $id, 1);

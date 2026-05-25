@@ -97,9 +97,8 @@ class StarsHelper extends Helper {
 		}
 
 		$class = $value ? ' starred' : '';
-		$icon = sprintf($html, $class, ' ' . implode(' ', $attributes));
 
-		return $icon;
+		return sprintf($html, $class, ' ' . implode(' ', $attributes));
 	}
 
 	/**
