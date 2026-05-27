@@ -32,11 +32,11 @@ class LikesController extends AppController {
 
 	/**
 	 * @param string|null $alias
-	 * @param string|null $id
+	 * @param mixed $id
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function like(?string $alias = null, ?string $id = null): ?Response {
+	public function like(?string $alias = null, $id = null): ?Response {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -61,11 +61,11 @@ class LikesController extends AppController {
 
 	/**
 	 * @param string|null $alias
-	 * @param string|null $id
+	 * @param mixed $id
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function dislike(?string $alias = null, ?string $id = null): ?Response {
+	public function dislike(?string $alias = null, $id = null): ?Response {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
@@ -90,11 +90,11 @@ class LikesController extends AppController {
 
 	/**
 	 * @param string|null $alias
-	 * @param string|null $id
+	 * @param mixed $id
 	 *
 	 * @return \Cake\Http\Response|null
 	 */
-	public function remove(?string $alias = null, ?string $id = null): ?Response {
+	public function remove(?string $alias = null, $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
 		$model = Configure::read('Favorites.models.' . $alias);
