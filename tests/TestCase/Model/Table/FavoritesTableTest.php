@@ -90,6 +90,19 @@ class FavoritesTableTest extends TestCase {
 	}
 
 	/**
+	 * @return void
+	 */
+	public function testAddWithUuidForeignKey(): void {
+		$uuid = '550e8400-e29b-41d4-a716-446655440000';
+
+		$result = $this->Favorites->add('UuidPosts', $uuid, 1);
+
+		$this->assertFalse($result->isNew());
+		$this->assertSame($uuid, $result->foreign_key);
+		$this->assertSame($uuid, $this->Favorites->find()->where(['model' => 'UuidPosts'])->firstOrFail()->foreign_key);
+	}
+
+	/**
 	 * Regression for the tightened unique index. The application path
 	 * (`FavoritesTable::add()`) already uses `findOrCreate` so it
 	 * doesn't accidentally duplicate, but the DB-level constraint
@@ -144,6 +157,21 @@ class FavoritesTableTest extends TestCase {
 
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(0, $favorites);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function testRemoveWithUuidForeignKey(): void {
+		$uuid = '550e8400-e29b-41d4-a716-446655440000';
+		$favorite = $this->Favorites->newEmptyEntity();
+		$favorite->patch(['model' => 'UuidPosts', 'foreign_key' => $uuid, 'user_id' => 1], ['guard' => false]);
+		$this->Favorites->saveOrFail($favorite);
+
+		$result = $this->Favorites->remove('UuidPosts', $uuid, 1);
+
+		$this->assertSame(1, $result);
+		$this->assertSame(0, $this->Favorites->find()->where(['model' => 'UuidPosts', 'foreign_key' => $uuid])->count());
 	}
 
 	/**

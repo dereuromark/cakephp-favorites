@@ -22,7 +22,7 @@ class FavoritesFixture extends TestFixture {
 	 */
 	public array $fields = [
 		'id' => ['type' => 'integer', 'length' => null, 'unsigned' => true, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true],
-		'foreign_key' => ['type' => 'integer', 'length' => null, 'unsigned' => true, 'null' => false, 'default' => null, 'comment' => ''],
+		'foreign_key' => ['type' => 'string', 'length' => 36, 'null' => false, 'default' => null, 'comment' => ''],
 		'model' => ['type' => 'string', 'length' => 80, 'null' => false, 'default' => '', 'comment' => ''],
 		'user_id' => ['type' => 'integer', 'length' => null, 'unsigned' => true, 'null' => true, 'default' => null, 'comment' => ''],
 		'value' => ['type' => 'tinyinteger', 'length' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
@@ -48,7 +48,7 @@ class FavoritesFixture extends TestFixture {
 	public function init(): void {
 		$this->records = [
 			[
-				'foreign_key' => 1,
+				'foreign_key' => '1',
 				'model' => 'Posts',
 				'user_id' => 1,
 				'value' => null,
