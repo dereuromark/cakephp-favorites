@@ -94,6 +94,7 @@ class FavoritesTableTest extends TestCase {
 	 */
 	public function testAddWithUuidForeignKey(): void {
 		$uuid = '550e8400-e29b-41d4-a716-446655440000';
+		$this->Favorites->getSchema()->setColumnType('foreign_key', 'string');
 
 		$result = $this->Favorites->add('UuidPosts', $uuid, 1);
 
@@ -164,6 +165,7 @@ class FavoritesTableTest extends TestCase {
 	 */
 	public function testRemoveWithUuidForeignKey(): void {
 		$uuid = '550e8400-e29b-41d4-a716-446655440000';
+		$this->Favorites->getSchema()->setColumnType('foreign_key', 'string');
 		$favorite = $this->Favorites->newEmptyEntity();
 		$favorite->patch(['model' => 'UuidPosts', 'foreign_key' => $uuid, 'user_id' => 1], ['guard' => false]);
 		$this->Favorites->saveOrFail($favorite);

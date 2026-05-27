@@ -79,12 +79,12 @@ class FavoritesTable extends Table {
 	/**
 	 * @param string $model
 	 * @param int|string $foreignKey
-	 * @param int|string $userId
+	 * @param int $userId
 	 * @param int|null $value
 	 *
 	 * @return \Favorites\Model\Entity\Favorite
 	 */
-	public function add(string $model, int|string $foreignKey, int|string $userId, ?int $value = null): Favorite {
+	public function add(string $model, int|string $foreignKey, int $userId, ?int $value = null): Favorite {
 		$data = [
 			'model' => $model,
 			'foreign_key' => $foreignKey,
@@ -106,11 +106,11 @@ class FavoritesTable extends Table {
 	/**
 	 * @param string $model
 	 * @param int|string $foreignKey
-	 * @param int|string $userId
+	 * @param int $userId
 	 *
 	 * @return int
 	 */
-	public function remove(string $model, int|string $foreignKey, int|string $userId): int {
+	public function remove(string $model, int|string $foreignKey, int $userId): int {
 		$data = [
 			'model' => $model,
 			'foreign_key' => $foreignKey,

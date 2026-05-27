@@ -10,7 +10,7 @@ use Cake\Core\Configure;
 trait AuthTrait {
 
 	/**
-	 * @return int|string|null
+	 * @return int|null
 	 */
 	protected function userId() {
 		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';

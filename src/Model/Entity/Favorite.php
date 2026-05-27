@@ -8,7 +8,7 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string $model
  * @property int|string $foreign_key
- * @property int|string $user_id
+ * @property int $user_id
  * @property int|null $value
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\ORM\Entity $user
