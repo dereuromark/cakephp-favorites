@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace Favorites\Test\TestCase\Model\Table;
 
 use Cake\Database\Exception\DatabaseException;
+use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\TestCase;
 use Favorites\Model\Table\FavoritesTable;
 use PDOException;
+use ReflectionClass;
 
 /**
  * Favorites\Model\Table\FavoritesTable Test Case
@@ -94,13 +96,14 @@ class FavoritesTableTest extends TestCase {
 	 */
 	public function testAddWithUuidForeignKey(): void {
 		$uuid = '550e8400-e29b-41d4-a716-446655440000';
-		$this->Favorites->getSchema()->setColumnType('foreign_key', 'string');
 
-		$result = $this->Favorites->add('UuidPosts', $uuid, 1);
+		$this->withStringForeignKeyColumn(function () use ($uuid): void {
+			$result = $this->Favorites->add('UuidPosts', $uuid, 1);
 
-		$this->assertFalse($result->isNew());
-		$this->assertSame($uuid, $result->foreign_key);
-		$this->assertSame($uuid, $this->Favorites->find()->where(['model' => 'UuidPosts'])->firstOrFail()->foreign_key);
+			$this->assertFalse($result->isNew());
+			$this->assertSame($uuid, $result->foreign_key);
+			$this->assertSame($uuid, $this->Favorites->find()->where(['model' => 'UuidPosts'])->firstOrFail()->foreign_key);
+		});
 	}
 
 	/**
@@ -165,15 +168,17 @@ class FavoritesTableTest extends TestCase {
 	 */
 	public function testRemoveWithUuidForeignKey(): void {
 		$uuid = '550e8400-e29b-41d4-a716-446655440000';
-		$this->Favorites->getSchema()->setColumnType('foreign_key', 'string');
-		$favorite = $this->Favorites->newEmptyEntity();
-		$favorite->patch(['model' => 'UuidPosts', 'foreign_key' => $uuid, 'user_id' => 1], ['guard' => false]);
-		$this->Favorites->saveOrFail($favorite);
 
-		$result = $this->Favorites->remove('UuidPosts', $uuid, 1);
+		$this->withStringForeignKeyColumn(function () use ($uuid): void {
+			$favorite = $this->Favorites->newEmptyEntity();
+			$favorite->patch(['model' => 'UuidPosts', 'foreign_key' => $uuid, 'user_id' => 1], ['guard' => false]);
+			$this->Favorites->saveOrFail($favorite);
 
-		$this->assertSame(1, $result);
-		$this->assertSame(0, $this->Favorites->find()->where(['model' => 'UuidPosts', 'foreign_key' => $uuid])->count());
+			$result = $this->Favorites->remove('UuidPosts', $uuid, 1);
+
+			$this->assertSame(1, $result);
+			$this->assertSame(0, $this->Favorites->find()->where(['model' => 'UuidPosts', 'foreign_key' => $uuid])->count());
+		});
 	}
 
 	/**
@@ -188,6 +193,76 @@ class FavoritesTableTest extends TestCase {
 
 		$favorites = $this->Favorites->find()->all()->toArray();
 		$this->assertCount(0, $favorites);
+	}
+
+	/**
+	 * Switch the favorites_favorites.foreign_key column to string for the duration
+	 * of a UUID-specific test, then restore the default integer-backed schema.
+	 *
+	 * @param callable $callback
+	 *
+	 * @return void
+	 */
+	protected function withStringForeignKeyColumn(callable $callback): void {
+		$connection = ConnectionManager::get('test');
+		$driver = $connection->getDriver();
+		$driverName = strtolower((new ReflectionClass($driver))->getShortName());
+
+		$this->Favorites->getSchema()->setColumnType('foreign_key', 'string');
+		$this->changeForeignKeyColumnToString($connection, $driverName);
+
+		try {
+			$callback();
+		} finally {
+			$this->changeForeignKeyColumnToInteger($connection, $driverName);
+			$this->Favorites->getSchema()->setColumnType('foreign_key', 'integer');
+			$this->Favorites->deleteAll(['model' => 'UuidPosts']);
+		}
+	}
+
+	/**
+	 * @param \Cake\Database\Connection $connection
+	 * @param string $driverName
+	 *
+	 * @return void
+	 */
+	protected function changeForeignKeyColumnToString($connection, string $driverName): void {
+		if (str_contains($driverName, 'mysql')) {
+			$connection->execute('ALTER TABLE favorites_favorites MODIFY foreign_key VARCHAR(36) NOT NULL');
+
+			return;
+		}
+		if (str_contains($driverName, 'postgres')) {
+			$connection->execute('ALTER TABLE favorites_favorites ALTER COLUMN foreign_key TYPE VARCHAR(36)');
+
+			return;
+		}
+		if (str_contains($driverName, 'sqlite')) {
+			return;
+		}
+	}
+
+	/**
+	 * @param \Cake\Database\Connection $connection
+	 * @param string $driverName
+	 *
+	 * @return void
+	 */
+	protected function changeForeignKeyColumnToInteger($connection, string $driverName): void {
+		if (str_contains($driverName, 'mysql')) {
+			$connection->execute('ALTER TABLE favorites_favorites MODIFY foreign_key INT UNSIGNED NOT NULL');
+
+			return;
+		}
+		if (str_contains($driverName, 'postgres')) {
+			$connection->execute('DELETE FROM favorites_favorites WHERE model = \'UuidPosts\'');
+			$connection->execute('ALTER TABLE favorites_favorites ALTER COLUMN foreign_key TYPE INTEGER USING foreign_key::integer');
+
+			return;
+		}
+		if (str_contains($driverName, 'sqlite')) {
+			return;
+		}
 	}
 
 }
