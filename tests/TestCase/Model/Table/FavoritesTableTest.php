@@ -214,9 +214,9 @@ class FavoritesTableTest extends TestCase {
 		try {
 			$callback();
 		} finally {
+			$this->Favorites->deleteAll(['model' => 'UuidPosts']);
 			$this->changeForeignKeyColumnToInteger($connection, $driverName);
 			$this->Favorites->getSchema()->setColumnType('foreign_key', 'integer');
-			$this->Favorites->deleteAll(['model' => 'UuidPosts']);
 		}
 	}
 
@@ -255,7 +255,6 @@ class FavoritesTableTest extends TestCase {
 			return;
 		}
 		if (str_contains($driverName, 'postgres')) {
-			$connection->execute('DELETE FROM favorites_favorites WHERE model = \'UuidPosts\'');
 			$connection->execute('ALTER TABLE favorites_favorites ALTER COLUMN foreign_key TYPE INTEGER USING foreign_key::integer');
 
 			return;
