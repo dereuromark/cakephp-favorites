@@ -73,7 +73,7 @@ class StarsHelper extends Helper {
 	 *
 	 * @return string
 	 */
-	public function icon(string $alias, int|string $id, ?bool $value = null) {
+	public function icon(string $alias, string|int $id, ?bool $value = null) {
 		if ($value === null) {
 			$value = $this->value($alias, $id);
 		}
@@ -108,7 +108,7 @@ class StarsHelper extends Helper {
 	 *
 	 * @return string
 	 */
-	public function linkIcon(string $alias, int|string $id, ?bool $value = null): string {
+	public function linkIcon(string $alias, string|int $id, ?bool $value = null): string {
 		if ($value === null) {
 			$value = $this->value($alias, $id);
 		}
@@ -127,7 +127,7 @@ class StarsHelper extends Helper {
 	 *
 	 * @return bool
 	 */
-	public function value(string $alias, int|string $id): bool {
+	public function value(string $alias, string|int $id): bool {
 		$uid = $this->userId();
 		if (!$uid) {
 			throw new MethodNotAllowedException('Must be logged in');
@@ -168,7 +168,7 @@ class StarsHelper extends Helper {
 	 *
 	 * @return array|string
 	 */
-	protected function url(string $action, string $alias, int|string $id): string|array {
+	protected function url(string $action, string $alias, string|int $id): array|string {
 		$strategy = Config::strategy($this->getConfig('strategy'));
 
 		return match ($strategy) {
@@ -186,7 +186,7 @@ class StarsHelper extends Helper {
 	 *
 	 * @return array|string
 	 */
-	public function urlStar(string $alias, int|string $id): string|array {
+	public function urlStar(string $alias, string|int $id): array|string {
 		return $this->url('star', $alias, $id);
 	}
 
@@ -198,7 +198,7 @@ class StarsHelper extends Helper {
 	 *
 	 * @return array|string
 	 */
-	public function urlUnstar(string $alias, int|string $id): string|array {
+	public function urlUnstar(string $alias, string|int $id): array|string {
 		return $this->url('unstar', $alias, $id);
 	}
 
@@ -209,7 +209,7 @@ class StarsHelper extends Helper {
 	 *
 	 * @return array
 	 */
-	protected function data(string $action, string $alias, int|string $id): array {
+	protected function data(string $action, string $alias, string|int $id): array {
 		$strategy = Config::strategy($this->getConfig('strategy'));
 
 		return match ($strategy) {

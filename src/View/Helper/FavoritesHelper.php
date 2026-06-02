@@ -73,7 +73,7 @@ class FavoritesHelper extends Helper {
 	 *
 	 * @return string
 	 */
-	public function widget(string $alias, int|string $id, ?int $value = null): string {
+	public function widget(string $alias, string|int $id, ?int $value = null): string {
 		if ($value === null) {
 			$value = $this->value($alias, $id);
 		}
@@ -113,7 +113,7 @@ class FavoritesHelper extends Helper {
 	 *
 	 * @return string
 	 */
-	public function icon(string $alias, int|string $id, ?int $value = null) {
+	public function icon(string $alias, string|int $id, ?int $value = null) {
 		if ($value === null) {
 			$value = $this->value($alias, $id);
 		}
@@ -140,7 +140,7 @@ class FavoritesHelper extends Helper {
 	 *
 	 * @return array
 	 */
-	protected function data(string $action, string $alias, int|string $id, ?int $value = null): array {
+	protected function data(string $action, string $alias, string|int $id, ?int $value = null): array {
 		$strategy = Config::strategy($this->getConfig('strategy'));
 
 		return match ($strategy) {
@@ -157,7 +157,7 @@ class FavoritesHelper extends Helper {
 	 *
 	 * @return array|string
 	 */
-	protected function url(string $action, string $alias, int|string $id): string|array {
+	protected function url(string $action, string $alias, string|int $id): array|string {
 		$strategy = Config::strategy($this->getConfig('strategy'));
 
 		return match ($strategy) {
@@ -173,7 +173,7 @@ class FavoritesHelper extends Helper {
 	 *
 	 * @return int|null
 	 */
-	public function value(string $alias, int|string $id): ?int {
+	public function value(string $alias, string|int $id): ?int {
 		$uid = $this->userId();
 		if (!$uid) {
 			throw new MethodNotAllowedException('Must be logged in');
@@ -215,7 +215,7 @@ class FavoritesHelper extends Helper {
 	 *
 	 * @return array|string
 	 */
-	public function urlAdd(string $alias, int|string $id): string|array {
+	public function urlAdd(string $alias, string|int $id): array|string {
 		return $this->url('add', $alias, $id);
 	}
 
@@ -227,7 +227,7 @@ class FavoritesHelper extends Helper {
 	 *
 	 * @return array|string
 	 */
-	public function urlRemove(string $alias, int|string $id): string|array {
+	public function urlRemove(string $alias, string|int $id): array|string {
 		return $this->url('remove', $alias, $id);
 	}
 
