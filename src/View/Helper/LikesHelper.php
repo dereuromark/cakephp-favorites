@@ -30,7 +30,7 @@ class LikesHelper extends Helper {
 	public const HTML_TYPE_FA6 = 1;
 
 	/**
-	 * @var array
+	 * @var array<int|string, array<string, mixed>|string>
 	 */
 	protected array $helpers = [
 		'Url',

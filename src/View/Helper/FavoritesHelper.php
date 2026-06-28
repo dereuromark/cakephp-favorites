@@ -39,7 +39,7 @@ class FavoritesHelper extends Helper {
 	public const ICON_RESET = '❌';
 
 	/**
-	 * @var array
+	 * @var array<int|string, array<string, mixed>|string>
 	 */
 	protected array $helpers = [
 		'Url',
