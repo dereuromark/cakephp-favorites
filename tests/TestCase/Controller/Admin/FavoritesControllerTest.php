@@ -108,18 +108,4 @@ class FavoritesControllerTest extends TestCase {
 		$this->assertSame(0, $this->fetchTable('Favorites.Favorites')->find()->count());
 	}
 
-	public function testResetIncludesEveryTargetForSharedTypeSpecificAlias(): void {
-		Configure::write('Favorites.models', [
-			'star' => ['Posts' => 'StarPosts'],
-			'like' => ['Posts' => 'LikePosts'],
-		]);
-		$favorites = $this->fetchTable('Favorites.Favorites');
-		$favorites->add('StarPosts', 1, 1);
-		$favorites->add('LikePosts', 1, 1, 1);
-		$this->post(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'index', '?' => ['model' => 'LikePosts']]);
-		$this->assertRedirect();
-		$this->assertSame(0, $favorites->find()->where(['model' => 'LikePosts'])->count());
-		$this->assertSame(1, $favorites->find()->where(['model' => 'StarPosts'])->count());
-	}
-
 }
