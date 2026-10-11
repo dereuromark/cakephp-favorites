@@ -307,7 +307,7 @@ class LikeableComponent extends Component {
 
 		$uid = Configure::read($sessionKey . '.' . $userIdField);
 		if ($uid) {
-			return $uid;
+			return Config::userId($uid);
 		}
 
 		$userId = $this->getConfig('userId') ?: null;
@@ -325,7 +325,7 @@ class LikeableComponent extends Component {
 			$userId = $this->Controller->getRequest()->getSession()->read($sessionKey . '.' . $userIdField);
 		}
 
-		return $userId;
+		return Config::userId($userId);
 	}
 
 	/**

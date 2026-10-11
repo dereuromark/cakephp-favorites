@@ -25,7 +25,7 @@ trait AuthTrait {
 
 		$uid = Configure::read($sessionKey . '.' . $userIdField);
 		if ($uid) {
-			return $uid;
+			return Config::userId($uid);
 		}
 
 		/** @var \App\View\AppView $view */
@@ -33,11 +33,11 @@ trait AuthTrait {
 		if ($view->helpers()->has('AuthUser')) {
 			$authUser = $view->helpers()->get('AuthUser');
 			if (method_exists($authUser, 'user')) {
-				return $authUser->user($userIdField);
+				return Config::userId($authUser->user($userIdField));
 			}
 		}
 
-		return $view->getRequest()->getSession()->read($sessionKey . '.' . $userIdField);
+		return Config::userId($view->getRequest()->getSession()->read($sessionKey . '.' . $userIdField));
 	}
 
 }

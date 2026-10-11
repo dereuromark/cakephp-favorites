@@ -315,7 +315,7 @@ class StarableComponent extends Component {
 
 		$uid = Configure::read($sessionKey . '.' . $userIdField);
 		if ($uid) {
-			return $uid;
+			return Config::userId($uid);
 		}
 
 		$userId = $this->getConfig('userId') ?: null;
@@ -333,7 +333,7 @@ class StarableComponent extends Component {
 			$userId = $this->Controller->getRequest()->getSession()->read($sessionKey . '.' . $userIdField);
 		}
 
-		return $userId;
+		return Config::userId($userId);
 	}
 
 	/**

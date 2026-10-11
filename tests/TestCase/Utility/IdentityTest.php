@@ -56,4 +56,18 @@ class IdentityTest extends TestCase {
 		}
 	}
 
+	public function testLegacySessionIdsAreValidated(): void {
+		foreach (['1', '1e4', '1.5', '1e4f8400-e29b-41d4-a716-446655440000'] as $value) {
+			Configure::delete('Auth.User');
+			$request = new ServerRequest();
+			$request->getSession()->write('Auth.User.id', $value);
+			$controller = new Controller($request);
+			$registry = new ComponentRegistry($controller);
+			foreach ([new StarsController($request), new StarsHelper(new View($request)), new StarableComponent($registry), new LikeableComponent($registry), new FavoriteableComponent($registry)] as $object) {
+				$method = new ReflectionMethod($object, 'userId');
+				$this->assertSame($value === '1' ? 1 : null, $method->invoke($object), $object::class);
+			}
+		}
+	}
+
 }
