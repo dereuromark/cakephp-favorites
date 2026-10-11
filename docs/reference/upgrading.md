@@ -17,7 +17,7 @@ Admin access is denied until `Favorites.adminAccess` returns literal `true` for 
 
 Earlier `Likeable` and `Favoriteable` behaviors defaulted their stored `model` to the table alias. They now resolve the configured public alias. With `Articles => Posts`, old behavior rows may therefore use `Posts`, while new rows use `Articles`. Earlier plugin controllers may instead have saved a qualified table name such as `Blog.Posts`.
 
-Legacy lookups are disabled for an ambiguous name, for example `Posts` when both `Blog.Posts` and `Shop.Posts` are configured. Qualified names remain usable when they identify one target. If the same public alias maps to different targets for different reaction types, legacy fallback is also disabled.
+Legacy lookups are disabled for an ambiguous name, for example `Posts` when both `Blog.Posts` and `Shop.Posts` are configured. Qualified names remain usable when they identify one target. A public alias must also avoid another model's historical table alias: with `Articles => Blog.Articles` and a second target `Shop.Articles`, a stored `Articles` row cannot identify its original table. Inspect and assign those rows manually before using that public alias. If the same public alias maps to different targets for different reaction types, legacy fallback is also disabled.
 
 Choose one alias for each reaction state. A data migration is optional for unambiguous mappings, but required to recover ambiguous rows. Back up the database, inspect the existing rows, and check for uniqueness conflicts before converting them. For an application where every `Posts` reaction should use `Articles`:
 
