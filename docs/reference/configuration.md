@@ -12,7 +12,7 @@ A flat map is available to all reaction types:
 ],
 ```
 
-Type-specific maps take precedence over matching flat aliases:
+Shared flat aliases take precedence when the same alias also appears in a type-specific map. Type-specific maps add aliases for their reaction type:
 
 ```php
 'Favorites' => [
