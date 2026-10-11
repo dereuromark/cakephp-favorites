@@ -6,12 +6,13 @@ namespace Favorites\Test\TestCase\Controller;
 use Cake\Core\Configure;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Favorites\Controller\StarsController;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * Favorites\Controller\StarsController Test Case
- *
- * @uses \Favorites\Controller\StarsController
  */
+#[UsesClass(StarsController::class)]
 class StarsControllerTest extends TestCase {
 
 	use IntegrationTestTrait;
@@ -98,6 +99,16 @@ class StarsControllerTest extends TestCase {
 		$this->delete(['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => 'delete', $favorite->id]);
 
 		$this->assertRedirect(['action' => 'index']);
+	}
+
+	public function testTypeSpecificAliasStoresTheAlias(): void {
+		Configure::write('Favorites.models', ['star' => ['Articles' => 'Posts']]);
+		$this->session(['Auth.User.id' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => 'star', 'Articles', 1]);
+		$this->assertRedirect();
+		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Articles'])->firstOrFail();
+		$this->assertSame(1, $favorite->foreign_key);
+		Configure::delete('Favorites.models');
 	}
 
 }

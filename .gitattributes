@@ -15,3 +15,5 @@ tests/test_app export-ignore
 tests/test_files export-ignore
 tests/TestCase.php export-ignore
 tests/bootstrap.php export-ignore
+
+docs export-ignore

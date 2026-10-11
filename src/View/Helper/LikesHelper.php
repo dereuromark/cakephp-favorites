@@ -4,9 +4,9 @@ namespace Favorites\View\Helper;
 
 use BadMethodCallException;
 use Cake\Core\Configure;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\View\Helper;
 use Favorites\Utility\Config;
 
@@ -16,7 +16,7 @@ use Favorites\Utility\Config;
  */
 class LikesHelper extends Helper {
 
-	use ModelAwareTrait;
+	use LocatorAwareTrait;
 	use AuthTrait;
 
 	/**
@@ -121,7 +121,7 @@ class LikesHelper extends Helper {
 
 		return match ($strategy) {
 			Config::STRATEGY_ACTION => $this->_View->getRequest()->getUri()->getPath(),
-			Config::STRATEGY_CONTROLLER => ['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
+			Config::STRATEGY_CONTROLLER => ['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => $action, $alias, $id],
 			default => throw new BadMethodCallException('Not implemented: ' . $strategy),
 		};
 	}
@@ -216,7 +216,7 @@ class LikesHelper extends Helper {
 		}
 
 		$class = $this->getConfig('favoriteClass') ?: 'Favorites.Favorites';
-		$table = $this->fetchModel($class);
+		$table = $this->fetchTable($class);
 
 		$entity = $table->find()
 			->select(['id', 'value'])
@@ -226,7 +226,7 @@ class LikesHelper extends Helper {
 				'user_id' => $uid,
 			])->first();
 
-		return $entity ? $entity->value : null;
+		return $entity ? $entity->get('value') : null;
 	}
 
 	/**

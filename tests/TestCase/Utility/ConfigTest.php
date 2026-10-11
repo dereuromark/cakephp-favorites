@@ -8,10 +8,9 @@ use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use Favorites\Utility\Config;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\UsesClass;
 
-/**
- * @uses \Favorites\Utility\Config
- */
+#[UsesClass(Config::class)]
 class ConfigTest extends TestCase {
 
 	/**
@@ -154,6 +153,16 @@ class ConfigTest extends TestCase {
 		$result = Config::models(Config::TYPE_STAR);
 		$this->assertArrayHasKey('StarPosts', $result);
 		$this->assertArrayHasKey('GeneralPosts', $result);
+	}
+
+	public function testTypeMapsExcludeOtherReactionTypes(): void {
+		Configure::write('Favorites.models', [
+			'star' => ['Posts' => 'Blog.Posts'],
+			'like' => ['Votes' => 'Blog.Votes'],
+			'Posts' => 'Posts',
+		]);
+		$this->assertSame(['Posts' => 'Blog.Posts'], Config::models(Config::TYPE_STAR));
+		$this->assertSame(['Votes' => 'Blog.Votes', 'Posts' => 'Posts'], Config::models(Config::TYPE_LIKE));
 	}
 
 }

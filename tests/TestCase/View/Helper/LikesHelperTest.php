@@ -11,10 +11,9 @@ use Cake\Routing\Router;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Favorites\View\Helper\LikesHelper;
+use PHPUnit\Framework\Attributes\UsesClass;
 
-/**
- * @uses \Favorites\View\Helper\LikesHelper
- */
+#[UsesClass(LikesHelper::class)]
 class LikesHelperTest extends TestCase {
 
 	/**

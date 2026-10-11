@@ -1,42 +1,8 @@
 <?php
 
-/**
- * FavoritesComponent
- *
- * Helps handle 'view' action of controller so it can list/add related favorites.
- * In related controller action there is no need to fetch associated data for favorites - this
- * component is fetching them separately (needed different result from model in dependency of
- * used displayType).
- *
- * Needs Router::connectNamed(array('favorite', 'favorite_view', 'favorite_action)) in config/routes.php.
- *
- * It is also usable to define (in controller, to not fetch unnecessary data
- * in used Controller::paginate() method):
- * var $paginate = array('Favorite' => array(
- *  'order' => array('Favorite.created' => 'desc'),
- *  'recursive' => 0,
- *  'limit' => 10
- * ));
- *
- * Includes helpers TextWidget and FavoriteWidget for controller, uses method
- * AppController::blackHole().
- *
- * Most of component methods possible to override in controller
- * for it need to create method with prefix _favorites
- * Ex. : _add -> _favoritesAdd, _fetchData -> _favoritesFetchData
- * Callbacks also need to prefix with '_favorites' in controller.
- *
- * callbacks
- * afterAdd
- *
- * params
- *  favorite
- *  favorite_view_type
- *  favorite_action
- */
-
 namespace Favorites\Controller\Component;
 
+use ArrayAccess;
 use BadMethodCallException;
 use Cake\Controller\Component;
 use Cake\Core\Configure;
@@ -59,6 +25,7 @@ class FavoriteableComponent extends Component {
 	protected array $_defaultConfig = [
 		'on' => 'startup',
 		'userIdField' => 'id',
+		'userModelClass' => 'Users',
 		'sessionKey' => null, // Defaults to 'Auth.User', use 'Auth' for CakeDC/Users
 	];
 
@@ -350,6 +317,11 @@ class FavoriteableComponent extends Component {
 		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
 		$sessionKey = $this->getConfig('sessionKey') ?? Configure::read('Favorites.sessionKey') ?? 'Auth.User';
 
+		$identity = $this->Controller->getRequest()->getAttribute('identity');
+		if ($identity instanceof ArrayAccess && isset($identity[$userIdField])) {
+			return (int)$identity[$userIdField];
+		}
+
 		$uid = Configure::read($sessionKey . '.' . $userIdField);
 		if ($uid) {
 			return $uid;
@@ -548,7 +520,7 @@ class FavoriteableComponent extends Component {
 	 * @return void
 	 */
 	public function flash($message) {
-		$isAjax = $this->Controller->params['isAjax'] ?? false;
+		$isAjax = $this->Controller->getRequest()->is('ajax');
 		if ($isAjax) {
 			$this->Controller->set('messageTxt', $message);
 		} else {
@@ -568,7 +540,7 @@ class FavoriteableComponent extends Component {
 	 * @return \Cake\Http\Response|null|void
 	 */
 	public function prgRedirect($urlBase = []) {
-		$isAjax = $this->Controller->getRequest()->getParam('isAjax') ?? false;
+		$isAjax = $this->Controller->getRequest()->is('ajax');
 
 		$url = array_merge(
 			array_diff_key($this->Controller->getRequest()->getParam('pass'), array_flip($this->_supportNamedParams)),

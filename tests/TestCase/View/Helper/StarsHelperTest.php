@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Favorites\Test\TestCase\View\Helper;
 
+use ArrayObject;
 use Cake\Core\Configure;
+use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Favorites\View\Helper\StarsHelper;
@@ -119,6 +121,17 @@ class StarsHelperTest extends TestCase {
 			1,
 		];
 		$this->assertEquals($expected, $result);
+	}
+
+	public function testIdentityAndPostLinkLayoutBlock(): void {
+		$this->getTableLocator()->get('Favorites.Favorites')->add('Articles', 1, 1);
+		$request = new ServerRequest();
+		$request = $request->withAttribute('identity', new ArrayObject(['id' => 1]));
+		$view = new View($request);
+		$helper = new StarsHelper($view);
+		$result = $helper->linkIcon('Articles', 1);
+		$this->assertStringContainsString('star starred', $result);
+		$this->assertStringContainsString('/favorites/Stars/unstar/Articles/1', $view->fetch('postLink'));
 	}
 
 }

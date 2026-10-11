@@ -9,50 +9,14 @@
 [![Total Downloads](https://poser.pugx.org/dereuromark/cakephp-favorites/d/total.svg)](https://packagist.org/packages/dereuromark/cakephp-favorites)
 [![Coding Standards](https://img.shields.io/badge/cs-PSR--2--R-purple.svg?style=flat-square)](https://github.com/php-fig-rectified/fig-rectified-standards)
 
-Favorites plugin for CakePHP applications.
+Favorites, stars, votes, and custom reactions for CakePHP applications.
 
-This branch is for use with **CakePHP 5.1+**. For details see [version map](https://github.com/dereuromark/cakephp-favorites/wiki#cakephp-version-map).
+The plugin stores one reaction per user, model alias, and record. Behaviors provide the storage API; helpers create POST links for the plugin controllers or your own action.
 
-## Motivation
+- **Stars:** add or remove a mark, with an optional stored counter.
+- **Likes:** store a like or dislike and remove a vote.
+- **Custom reactions:** map integer values to application-defined icons.
 
-The old Favorites plugins don't seem to be supported anymore:
-- https://github.com/CakeDC/favorites (Cake 2)
-- Similar to https://github.com/aschelch/cakephp-like-plugin (Cake 2)
+Read the **[documentation website](https://dereuromark.github.io/cakephp-favorites/)**, starting with [Installation](https://dereuromark.github.io/cakephp-favorites/guide/installation) and [Getting started](https://dereuromark.github.io/cakephp-favorites/guide/getting-started).
 
-This plugin aims to merge and revive them as modern CakePHP 5.x plugin.
-Hopefully we can have all the features back up and working soon.
-
-## Features
-
-"Favorites" lets people express how they feel about some content.
-Make any model reactable in a minutes!
-
-There are many implementations in modern applications:
-
-- Starred a.k.a GitHub stars (and remove star)
-- GitHub Reactions
-- Facebook Reactions
-- YouTube Likes
-- Slack Reactions
-- Reddit Votes
-- Medium Claps
-
-This package so far mainly supports basic reactions per entity in 3 different types:
-- **star** (yes/no)
-- **like** (upvote/downvote/none)
-- **favorite** (custom enum list)
-
-But it could be developed in mind that it should cover all the possible use cases and
-be viable in enterprise applications including multiple reactions per entity.
-Help is appreciated.
-
-A "counter-cache" field can be put on the starred record itself, to more easily count the
-"stars" without having to calculate it at runtime.
-
-For ratings (e.g. 1-5 star range) use https://github.com/dereuromark/cakephp-ratings instead.
-
-### Install, Setup, Usage
-See the **[Docs](docs/README.md)** for details.
-
-### Demo
-See https://sandbox.dereuromark.de/sandbox/favorite-examples
+The [version map](https://github.com/dereuromark/cakephp-favorites/wiki#cakephp-version-map) covers older framework branches. For numeric ratings, use [CakePHP Ratings](https://github.com/dereuromark/cakephp-ratings). Try the [sandbox examples](https://sandbox.dereuromark.de/sandbox/favorite-examples).

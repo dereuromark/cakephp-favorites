@@ -88,4 +88,10 @@ class LikeableBehaviorTest extends TestCase {
 		$this->assertCount(1, $favorites);
 	}
 
+	public function testFinderByUserUsesNamedArguments(): void {
+		$this->table->Favorites->add('Posts', 1, 1, 1);
+		$this->assertSame([1], $this->table->find('likedBy', userId: 1)->all()->extract('id')->toList());
+		$this->assertSame([], $this->table->find('likedBy', userId: 2)->all()->extract('id')->toList());
+	}
+
 }

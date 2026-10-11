@@ -6,12 +6,13 @@ namespace Favorites\Test\TestCase\Controller;
 use Cake\Core\Configure;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Favorites\Controller\LikesController;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * Favorites\Controller\LikesController Test Case
- *
- * @uses \Favorites\Controller\LikesController
  */
+#[UsesClass(LikesController::class)]
 class LikesControllerTest extends TestCase {
 
 	use IntegrationTestTrait;

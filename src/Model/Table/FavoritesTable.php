@@ -117,7 +117,14 @@ class FavoritesTable extends Table {
 			'user_id' => $userId,
 		];
 
-		return $this->deleteAll($data);
+		$count = 0;
+		foreach ($this->find()->where($data) as $favorite) {
+			if ($this->delete($favorite)) {
+				$count++;
+			}
+		}
+
+		return $count;
 	}
 
 	/**
