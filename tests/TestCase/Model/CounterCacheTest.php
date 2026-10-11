@@ -70,4 +70,13 @@ class CounterCacheTest extends TestCase {
 		$this->assertSame(2, $post->count);
 	}
 
+	public function testRemovingAStarRefreshesTheCounter(): void {
+		$this->table->addBehavior('Favorites.Starable', ['counterCache' => true, 'fieldCounter' => 'count']);
+		$this->table->Favorites->deleteAll([]);
+		$this->table->getBehavior('Starable')->addStar(['modelId' => 1, 'userId' => 1]);
+		$this->assertSame(1, $this->table->get(1)->count);
+		$this->assertSame(1, $this->table->getBehavior('Starable')->removeStar(['modelId' => 1, 'userId' => 1]));
+		$this->assertSame(0, $this->table->get(1)->count);
+	}
+
 }

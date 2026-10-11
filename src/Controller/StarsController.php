@@ -3,10 +3,10 @@
 namespace Favorites\Controller;
 
 use App\Controller\AppController;
-use Cake\Core\Configure;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
+use Favorites\Utility\Config;
 
 /**
  * @property \Favorites\Model\Table\FavoritesTable $Favorites
@@ -39,8 +39,8 @@ class StarsController extends AppController {
 	public function star(?string $alias = null, $id = null): ?Response {
 		$this->request->allowMethod(['post', 'put', 'patch']);
 
-		$model = Configure::read('Favorites.models.' . $alias);
-		if (!$model) {
+		$model = Config::models(Config::TYPE_STAR)[$alias ?? ''] ?? null;
+		if (!$alias || !$model) {
 			throw new NotFoundException('Invalid alias');
 		}
 		$table = $this->fetchTable($model);
@@ -51,7 +51,7 @@ class StarsController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to add star');
 		}
 
-		$result = $this->Favorites->add($model, $entity->get('id'), $uid);
+		$result = $this->Favorites->add($alias, $entity->get('id'), $uid);
 		if ($result->hasErrors()) {
 			$this->Flash->error(__d('favorites', 'Could not save star, please try again.'));
 		}
@@ -68,8 +68,8 @@ class StarsController extends AppController {
 	public function unstar(?string $alias = null, $id = null): ?Response {
 		$this->request->allowMethod(['post', 'delete']);
 
-		$model = Configure::read('Favorites.models.' . $alias);
-		if (!$model) {
+		$model = Config::models(Config::TYPE_STAR)[$alias ?? ''] ?? null;
+		if (!$alias || !$model) {
 			throw new NotFoundException('Invalid alias');
 		}
 		$table = $this->fetchTable($model);
@@ -80,7 +80,7 @@ class StarsController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to remove star');
 		}
 
-		$this->Favorites->remove($model, $entity->get('id'), $uid);
+		$this->Favorites->remove($alias, $entity->get('id'), $uid);
 
 		return $this->redirect($this->referer(['action' => 'index']));
 	}

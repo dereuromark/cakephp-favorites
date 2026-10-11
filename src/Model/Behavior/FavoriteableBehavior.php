@@ -7,6 +7,7 @@ use Cake\ORM\Behavior;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
+use Favorites\Utility\Config;
 
 /**
  * FavoriteableBehavior - Adds favorites functionality to any model.
@@ -20,10 +21,10 @@ use Favorites\Model\Table\FavoritesTable;
  * $this->addBehavior('Favorites.Favoriteable');
  *
  * // Add a favorite
- * $this->Articles->addFavorite(['modelId' => $articleId, 'userId' => $userId]);
+ * $this->Articles->getBehavior('Favoriteable')->addFavorite(['modelId' => $articleId, 'userId' => $userId]);
  *
  * // Remove a favorite
- * $this->Articles->removeFavorite(['modelId' => $articleId, 'userId' => $userId]);
+ * $this->Articles->getBehavior('Favoriteable')->removeFavorite(['modelId' => $articleId, 'userId' => $userId]);
  *
  * // Find with favorites
  * $this->Articles->find('favorites', id: $articleId);
@@ -74,7 +75,7 @@ class FavoriteableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$this->setConfig('model', $this->_table->getAlias());
+			$this->setConfig('model', Config::alias($this->_table->getRegistryAlias(), Config::TYPE_FAVORITE) ?: $this->_table->getAlias());
 		}
 		if (!$this->getConfig('modelClass')) {
 			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
@@ -157,18 +158,37 @@ class FavoriteableBehavior extends Behavior {
 	 *
 	 * @param \Cake\ORM\Query\SelectQuery $query
 	 * @param array<string, mixed> $options
+	 * @param string|int|null $id
 	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
-	public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
+	public function findFavorites(SelectQuery $query, array $options = [], string|int|null $id = null): SelectQuery {
+		$id ??= $options['id'] ?? null;
+
 		return $query->contain([
-			'Favorites' => function (SelectQuery $q) use ($options) {
+			'Favorites' => function (SelectQuery $q) use ($id) {
 				$q->contain('Users');
-				$q->where(['foreign_key' => $options['id']]);
+				if ($id !== null) {
+					$q->where(['Favorites.foreign_key' => $id]);
+				}
 
 				return $q;
 			},
 		]);
+	}
+
+	/**
+	 * @param \Cake\ORM\Query\SelectQuery $query
+	 * @param int $userId
+     *
+	 * @return \Cake\ORM\Query\SelectQuery
+	 */
+	public function findFavoritesBy(SelectQuery $query, int $userId): SelectQuery {
+		$subQuery = $this->favoritesTable()->find()
+			->select(['foreign_key'])
+			->where(['model' => $this->getConfig('model'), 'user_id' => $userId]);
+
+		return $query->where([$this->_table->getAlias() . '.id IN' => $subQuery]);
 	}
 
 	/**

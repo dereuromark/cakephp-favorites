@@ -67,11 +67,25 @@ class Config {
 	 */
 	public static function models(string $type): array {
 		$models = (array)Configure::read('Favorites.models');
-		if (isset($models[$type])) {
-			return array_merge($models[$type], $models);
+		if (is_array($models[$type] ?? null)) {
+			return $models[$type] + array_filter($models, 'is_string');
 		}
 
-		return $models;
+		return array_filter($models, 'is_string');
+	}
+
+	/**
+	 * @param mixed $value
+     *
+	 * @return int|null
+	 */
+	public static function userId(mixed $value): ?int {
+		if (!is_int($value) && (!is_string($value) || !ctype_digit($value))) {
+			return null;
+		}
+		$id = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+		return $id === false ? null : $id;
 	}
 
 }

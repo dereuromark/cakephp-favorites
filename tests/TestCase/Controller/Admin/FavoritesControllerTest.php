@@ -6,10 +6,10 @@ namespace Favorites\Test\TestCase\Controller\Admin;
 use Cake\Core\Configure;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Favorites\Controller\Admin\FavoritesController;
+use PHPUnit\Framework\Attributes\UsesClass;
 
-/**
- * @uses \Favorites\Controller\Admin\FavoritesController
- */
+#[UsesClass(FavoritesController::class)]
 class FavoritesControllerTest extends TestCase {
 
 	use IntegrationTestTrait;
@@ -92,6 +92,13 @@ class FavoritesControllerTest extends TestCase {
 		$this->post(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'delete', 1]);
 
 		$this->assertRedirect(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'index']);
+	}
+
+	public function testResetAllowsATypeSpecificModelAlias(): void {
+		Configure::write('Favorites.models', ['star' => ['Posts' => 'Posts']]);
+		$this->post(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'index', '?' => ['model' => 'Posts']]);
+		$this->assertRedirect();
+		$this->assertSame(0, $this->fetchTable('Favorites.Favorites')->find()->count());
 	}
 
 }

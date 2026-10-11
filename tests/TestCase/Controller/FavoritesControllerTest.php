@@ -6,12 +6,13 @@ namespace Favorites\Test\TestCase\Controller;
 use Cake\Core\Configure;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Favorites\Controller\FavoritesController;
+use PHPUnit\Framework\Attributes\UsesClass;
 
 /**
  * Favorites\Controller\FavoritesController Test Case
- *
- * @uses \Favorites\Controller\FavoritesController
  */
+#[UsesClass(FavoritesController::class)]
 class FavoritesControllerTest extends TestCase {
 
 	use IntegrationTestTrait;
@@ -26,6 +27,11 @@ class FavoritesControllerTest extends TestCase {
 		'plugin.Favorites.Posts',
 		'plugin.Favorites.Users',
 	];
+
+	protected function tearDown(): void {
+		Configure::delete('Favorites.models');
+		parent::tearDown();
+	}
 
 	/**
 	 * Test add method
@@ -51,7 +57,6 @@ class FavoritesControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -76,7 +81,6 @@ class FavoritesControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -98,6 +102,16 @@ class FavoritesControllerTest extends TestCase {
 		$this->delete(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'delete', $favorite->id]);
 
 		$this->assertRedirect(['action' => 'index']);
+	}
+
+	public function testTypeSpecificAliasStoresTheAlias(): void {
+		Configure::write('Favorites.models', ['favorite' => ['Articles' => 'Posts']]);
+		$this->session(['Auth.User.id' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'add', 'Articles', 1], ['value' => 4]);
+		$this->assertRedirect();
+		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Articles'])->firstOrFail();
+		$this->assertSame(1, $favorite->foreign_key);
+		$this->assertSame(4, $favorite->value);
 	}
 
 }

@@ -24,12 +24,12 @@ return [
 		// CakeDC/Users. Can be overridden per component via its 'sessionKey'.
 		'sessionKey' => 'Auth.User',
 
-		// Admin access gate. REQUIRED — the host app MUST set this to a Closure
+		// Admin access gate. REQUIRED: the host app MUST set this to a Closure
 		// that receives the current request and returns literal true to grant
 		// access to /admin/favorites/...; anything else (unset, non-Closure,
 		// returns false, returns a truthy non-bool, or throws) yields a 403.
 		// The default policy is deny.
-		// Example — admin role check on the cakephp/authentication identity:
+		// Example: admin role check on the cakephp/authentication identity:
 		'adminAccess' => function (ServerRequest $request): bool {
 			$identity = $request->getAttribute('identity');
 

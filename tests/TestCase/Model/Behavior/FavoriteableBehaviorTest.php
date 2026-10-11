@@ -84,4 +84,17 @@ class FavoriteableBehaviorTest extends TestCase {
 		$this->assertCount(0, $favorites);
 	}
 
+	public function testFinderByUserUsesNamedArguments(): void {
+		$this->table->Favorites->add('Posts', 1, 1, 1);
+		$this->assertSame([1], $this->table->find('favoritesBy', userId: 1)->all()->extract('id')->toList());
+		$this->assertSame([], $this->table->find('favoritesBy', userId: 2)->all()->extract('id')->toList());
+	}
+
+	public function testFavoritesFinderAcceptsNamedId(): void {
+		$this->table->Favorites->add('Posts', 1, 1, 4);
+		$post = $this->table->find('favorites', id: 1)->where(['Posts.id' => 1])->firstOrFail();
+		$this->assertCount(1, $post->favorites);
+		$this->assertSame(4, $post->favorites[0]->value);
+	}
+
 }

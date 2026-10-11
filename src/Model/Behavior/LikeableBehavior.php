@@ -7,6 +7,7 @@ use Cake\ORM\Behavior;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
+use Favorites\Utility\Config;
 
 class LikeableBehavior extends Behavior {
 
@@ -23,7 +24,8 @@ class LikeableBehavior extends Behavior {
 		'countFavorites' => false,
 		'implementedFinders' => [
 			'liked' => 'findLiked',
-			'LikedBy' => 'findLikedBy',
+			'likedBy' => 'findLikedBy',
+			'disliked' => 'findDisliked',
 		],
 	];
 
@@ -50,7 +52,7 @@ class LikeableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$this->setConfig('model', $this->_table->getAlias());
+			$this->setConfig('model', Config::alias($this->_table->getRegistryAlias(), Config::TYPE_LIKE) ?: $this->_table->getAlias());
 		}
 		if (!$this->getConfig('modelClass')) {
 			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
@@ -169,6 +171,19 @@ class LikeableBehavior extends Behavior {
 		$modelAlias = $this->_table->getAlias();
 
 		return $query->where([$modelAlias . '.id IN' => $subQuery]);
+	}
+
+	/**
+	 * @param \Cake\ORM\Query\SelectQuery $query
+	 * @param int $userId
+     *
+	 * @return \Cake\ORM\Query\SelectQuery
+	 */
+	public function findLikedBy(SelectQuery $query, int $userId): SelectQuery {
+		$subQuery = $this->buildLikedQuerySnippet(1)
+			->where([$this->favoritesTable()->getAlias() . '.user_id' => $userId]);
+
+		return $query->where([$this->_table->getAlias() . '.id IN' => $subQuery]);
 	}
 
 	/**
