@@ -108,7 +108,18 @@ class FavoritesTable extends Table {
 
 		$favorite->value = $value;
 
-		$this->saveOrFail($favorite);
+		$this->getConnection()->transactional(function () use ($favorite, $model, $foreignKey, $userId): void {
+			$this->saveOrFail($favorite);
+			$duplicates = $this->find()->where([
+				'model IN' => Config::storageModels($model),
+				'foreign_key' => $foreignKey,
+				'user_id' => $userId,
+				'id !=' => $favorite->get('id'),
+			]);
+			foreach ($duplicates as $duplicate) {
+				$this->deleteOrFail($duplicate);
+			}
+		});
 
 		return $favorite;
 	}

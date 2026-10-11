@@ -260,7 +260,7 @@ class LikeableComponent extends Component {
 		$options = [
 			'userId' => $this->userId(),
 			'modelId' => $modelId,
-			'model IN' => Config::storageModels($alias),
+			'model' => $alias,
 		];
 		$action = $this->action($actionName);
 

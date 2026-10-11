@@ -164,6 +164,7 @@ class LikesControllerTest extends TestCase {
 	}
 
 	public function testLegacyTableAliasIsUpdatedWithoutDuplicate(): void {
+		Configure::write('Favorites.legacyModels', ['Articles' => ['Posts']]);
 		Configure::write('Favorites.models', ['like' => ['Articles' => 'Posts']]);
 		$this->session(['Auth.User.id' => 1]);
 		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Articles', 1]);

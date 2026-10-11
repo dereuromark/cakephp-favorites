@@ -80,27 +80,21 @@ class Config {
 	 * @return list<string>
 	 */
 	public static function storageModels(string $alias): array {
-		$maps = [static::models(static::TYPE_STAR), static::models(static::TYPE_LIKE), static::models(static::TYPE_FAVORITE)];
-		$targets = [];
-		foreach ($maps as $map) {
-			if (isset($map[$alias])) {
-				$targets[] = $map[$alias];
-			}
-		}
-		$targets = array_values(array_unique($targets));
-		if (count($targets) !== 1) {
-			return [$alias];
-		}
-		$target = $targets[0];
-		[, $tableAlias] = pluginSplit($target);
+		$legacyModels = (array)Configure::read('Favorites.legacyModels');
 		$result = [$alias];
-		foreach (array_unique([$target, $tableAlias]) as $legacy) {
-			foreach ($maps as $map) {
-				foreach ($map as $key => $model) {
-					[, $otherAlias] = pluginSplit($model);
-					if ($model !== $target && ($key === $legacy || $otherAlias === $legacy)) {
-						continue 3;
-					}
+		foreach ((array)($legacyModels[$alias] ?? []) as $legacy) {
+			if (!is_string($legacy) || $legacy === '') {
+				continue;
+			}
+			foreach ($legacyModels as $otherAlias => $names) {
+				if ($otherAlias !== $alias && in_array($legacy, (array)$names, true)) {
+					throw new InvalidArgumentException('Legacy model name is assigned to several aliases: ' . $legacy);
+				}
+			}
+			foreach ([static::TYPE_STAR, static::TYPE_LIKE, static::TYPE_FAVORITE] as $type) {
+				$models = static::models($type);
+				if ($legacy !== $alias && isset($models[$legacy])) {
+					throw new InvalidArgumentException('Legacy model name is an active public alias: ' . $legacy);
 				}
 			}
 			$result[] = $legacy;
