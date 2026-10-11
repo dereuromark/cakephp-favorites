@@ -104,12 +104,13 @@ class FavoritesControllerTest extends TestCase {
 		$this->assertRedirect(['action' => 'index']);
 	}
 
-	public function testTypeSpecificAliasStoresTheAlias(): void {
+	public function testTypeSpecificAliasKeepsConfiguredStorageModel(): void {
 		Configure::write('Favorites.models', ['favorite' => ['Articles' => 'Posts']]);
+		$this->fetchTable('Favorites.Favorites')->deleteAll([]);
 		$this->session(['Auth.User.id' => 1]);
 		$this->post(['plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'add', 'Articles', 1], ['value' => 4]);
 		$this->assertRedirect();
-		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Articles'])->firstOrFail();
+		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Posts'])->firstOrFail();
 		$this->assertSame(1, $favorite->foreign_key);
 		$this->assertSame(4, $favorite->value);
 	}

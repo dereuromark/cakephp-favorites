@@ -18,4 +18,4 @@ Adapt the role check to your application's actual identity. Keep its normal auth
 
 The index lists stored model names and supports resetting reactions for a configured model through a POST request. The listing page contains the configured `Users` association and allows individual deletions. Reset deletes rows in bulk; it does not recalculate host CounterCache columns.
 
-Reset accepts aliases from both flat and type-specific model maps. An unconfigured alias is rejected.
+Reset accepts configured map keys and target names from flat and type-specific model maps. It deletes only rows with that exact stored model name. An unconfigured name is rejected.

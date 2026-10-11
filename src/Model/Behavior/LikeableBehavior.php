@@ -7,7 +7,6 @@ use Cake\ORM\Behavior;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
-use Favorites\Utility\Config;
 
 class LikeableBehavior extends Behavior {
 
@@ -52,7 +51,7 @@ class LikeableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$this->setConfig('model', Config::alias($this->_table->getRegistryAlias(), Config::TYPE_LIKE) ?: $this->_table->getAlias());
+			$this->setConfig('model', $this->_table->getAlias());
 		}
 		if (!$this->getConfig('modelClass')) {
 			$this->setConfig('modelClass', $this->_table->getRegistryAlias());

@@ -22,6 +22,11 @@ class LikesIntegrationControllerTest extends TestCase {
 		'plugin.Favorites.Users',
 	];
 
+	protected function tearDown(): void {
+		Configure::delete('Favorites');
+		parent::tearDown();
+	}
+
 	/**
 	 * @uses \TestApp\Controller\LikedPostsController::view()
 	 *
@@ -46,7 +51,6 @@ class LikesIntegrationControllerTest extends TestCase {
 		$this->assertResponseContains('👍');
 		$this->assertResponseContains('👎');
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -76,7 +80,26 @@ class LikesIntegrationControllerTest extends TestCase {
 		//dd((string)$this->_response->getBody());
 		//$this->assertResponseContains('<span class="star" title="Click to star." style="color: #aaa">★</span>');
 
-		Configure::delete('Favorites.models');
+	}
+
+	/**
+	 * @return void
+	 */
+	public function testActionComponentKeepsThePostedStorageModel(): void {
+		$this->disableErrorHandlerMiddleware();
+		Configure::write('Favorites.models', ['WishlistedPosts' => 'Posts']);
+		Configure::write('Favorites.useEntity', false);
+		$this->session(['Auth.User.id' => 1]);
+		$this->post(['controller' => 'LikedPosts', 'action' => 'view', 1], [
+			'favorite' => 1,
+			'alias' => 'WishlistedPosts',
+			'action' => 'like',
+			'id' => 1,
+		]);
+		$this->assertRedirect();
+		$favorites = $this->fetchTable('Favorites.Favorites');
+		$this->assertSame(1, $favorites->find()->where(['model' => 'WishlistedPosts', 'value' => 1])->count());
+		$this->assertSame(1, $favorites->find()->where(['model' => 'Posts', 'value IS' => null])->count());
 	}
 
 }

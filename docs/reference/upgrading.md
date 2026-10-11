@@ -4,23 +4,19 @@ Back up the database and read the changes for your installed version before upda
 
 After updating the package, run the plugin migrations. The tightened unique index allows one reaction per user and record regardless of value. Existing duplicates must be reconciled before that migration can succeed.
 
-Use CakePHP's named finder arguments: `find('starredBy', userId: $userId)`, `find('likedBy', userId: $userId)`, and `find('favorites', id: $postId)`. The current custom finder APIs avoid deprecated positional options arrays in application calls.
-
-The controller and behavior model maps now resolve type-specific aliases consistently. Existing records saved under full table names such as `Blog.Posts` need an application data migration if the public alias is `Articles`. Do not update those values blindly if several aliases point to the same table.
+Use CakePHP's named finder arguments: `find('starredBy', userId: $userId)`, `find('likedBy', userId: $userId)`, and `find('favorites', id: $postId)`. The `favorites` finder retains its existing options parameter, including direct calls from subclasses.
 
 The `Starred` association is available without a user ID, so list queries can contain it with an explicit user condition. `Liked` and `Favorite` are still created only when a user ID is supplied to the corresponding behavior.
 
 Admin access is denied until `Favorites.adminAccess` returns literal `true` for the request. Check your application's authentication, authorization, and CSRF configuration after an upgrade.
 
 
-## Existing behavior aliases
+## Stored model keys
 
-Earlier `Likeable` and `Favoriteable` behaviors defaulted their stored `model` to the table alias. They now resolve the configured public alias. With `Articles => Posts`, old behavior rows may therefore use `Posts`, while new rows use `Articles`. Earlier plugin controllers may instead have saved a qualified table name such as `Blog.Posts`.
+Stored model identifiers retain their released defaults. Plugin controllers store the configured table locator target. An explicit behavior `model` remains authoritative. Likeable and Favoriteable default to the table alias. Starable retains its released default of the first matching configured star alias, with the table alias as fallback. Helpers and action components use the model alias supplied by the caller. Reads use exact equality and do not match several stored model keys. Existing rows are not rewritten or reconciled automatically.
 
-Choose one alias for each reaction state. Back up the database, inspect the existing rows, and check for uniqueness conflicts before converting them. For an application where every `Posts` reaction should use `Articles`:
+Keep matching keys across these paths. For the simple `Posts => Posts` setup, all use `Posts`. For separate relations backed by one class and physical table, retain distinct table locator aliases and matching helper keys. An explicit behavior `model` remains authoritative. [Configuration](./configuration#independent-relations-on-one-table) provides examples.
 
-```sql
-UPDATE favorites_favorites SET model = 'Articles' WHERE model = 'Posts';
-```
+If an application already used different route and storage names, inspect its existing rows before changing configuration. The plugin cannot infer whether two names represent the same reaction state or different relations. Choose the intended key explicitly; any data conversion belongs in an application migration after checking ownership and uniqueness conflicts.
 
-Adapt both values to your application. Do not run this conversion when the old alias contains several reaction states that need separate aliases. You can temporarily preserve behavior lookups with an explicit `model => 'Posts'` behavior option while planning the data migration.
+The helper's existing `fetchModel()`, `modelFactory()`, `getModelType()`, and `setModelType()` APIs remain available. Custom repository factories still supply helper reaction lookups.

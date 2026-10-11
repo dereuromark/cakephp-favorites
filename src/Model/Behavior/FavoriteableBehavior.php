@@ -7,7 +7,6 @@ use Cake\ORM\Behavior;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
-use Favorites\Utility\Config;
 
 /**
  * FavoriteableBehavior - Adds favorites functionality to any model.
@@ -75,7 +74,7 @@ class FavoriteableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$this->setConfig('model', Config::alias($this->_table->getRegistryAlias(), Config::TYPE_FAVORITE) ?: $this->_table->getAlias());
+			$this->setConfig('model', $this->_table->getAlias());
 		}
 		if (!$this->getConfig('modelClass')) {
 			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
@@ -158,12 +157,11 @@ class FavoriteableBehavior extends Behavior {
 	 *
 	 * @param \Cake\ORM\Query\SelectQuery $query
 	 * @param array<string, mixed> $options
-	 * @param string|int|null $id
 	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
-	public function findFavorites(SelectQuery $query, array $options = [], string|int|null $id = null): SelectQuery {
-		$id ??= $options['id'] ?? null;
+	public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
+		$id = $options['id'] ?? null;
 
 		return $query->contain([
 			'Favorites' => function (SelectQuery $q) use ($id) {
