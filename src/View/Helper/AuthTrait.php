@@ -4,6 +4,7 @@ namespace Favorites\View\Helper;
 
 use ArrayAccess;
 use Cake\Core\Configure;
+use Favorites\Utility\Config;
 
 /**
  * @mixin \Cake\View\Helper
@@ -19,7 +20,7 @@ trait AuthTrait {
 
 		$identity = $this->_View->getRequest()->getAttribute('identity');
 		if ($identity instanceof ArrayAccess && isset($identity[$userIdField])) {
-			return (int)$identity[$userIdField];
+			return Config::userId($identity[$userIdField]);
 		}
 
 		$uid = Configure::read($sessionKey . '.' . $userIdField);

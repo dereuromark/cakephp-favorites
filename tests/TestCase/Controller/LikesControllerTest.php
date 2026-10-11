@@ -28,6 +28,11 @@ class LikesControllerTest extends TestCase {
 		'plugin.Favorites.Users',
 	];
 
+	protected function tearDown(): void {
+		Configure::delete('Favorites.models');
+		parent::tearDown();
+	}
+
 	/**
 	 * Test add method
 	 *
@@ -74,7 +79,6 @@ class LikesControllerTest extends TestCase {
 			);
 		}
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -101,7 +105,6 @@ class LikesControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -126,7 +129,6 @@ class LikesControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -148,6 +150,16 @@ class LikesControllerTest extends TestCase {
 		$this->delete(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'delete', $favorite->id]);
 
 		$this->assertRedirect(['action' => 'index']);
+	}
+
+	public function testTypeSpecificAliasStoresTheAlias(): void {
+		Configure::write('Favorites.models', ['like' => ['Articles' => 'Posts']]);
+		$this->session(['Auth.User.id' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Articles', 1]);
+		$this->assertRedirect();
+		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Articles'])->firstOrFail();
+		$this->assertSame(1, $favorite->foreign_key);
+		$this->assertSame(1, $favorite->value);
 	}
 
 }

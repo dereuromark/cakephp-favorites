@@ -10,6 +10,7 @@ use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Utility\Inflector;
+use Favorites\Utility\Config;
 use RuntimeException;
 
 /**
@@ -319,7 +320,7 @@ class FavoriteableComponent extends Component {
 
 		$identity = $this->Controller->getRequest()->getAttribute('identity');
 		if ($identity instanceof ArrayAccess && isset($identity[$userIdField])) {
-			return (int)$identity[$userIdField];
+			return Config::userId($identity[$userIdField]);
 		}
 
 		$uid = Configure::read($sessionKey . '.' . $userIdField);

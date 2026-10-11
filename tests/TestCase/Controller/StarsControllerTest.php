@@ -28,6 +28,11 @@ class StarsControllerTest extends TestCase {
 		'plugin.Favorites.Users',
 	];
 
+	protected function tearDown(): void {
+		Configure::delete('Favorites.models');
+		parent::tearDown();
+	}
+
 	/**
 	 * Test add method
 	 *
@@ -52,7 +57,6 @@ class StarsControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -77,7 +81,6 @@ class StarsControllerTest extends TestCase {
 
 		$this->assertRedirect(['action' => 'index']);
 
-		Configure::delete('Favorites.models');
 	}
 
 	/**
@@ -108,7 +111,6 @@ class StarsControllerTest extends TestCase {
 		$this->assertRedirect();
 		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Articles'])->firstOrFail();
 		$this->assertSame(1, $favorite->foreign_key);
-		Configure::delete('Favorites.models');
 	}
 
 }

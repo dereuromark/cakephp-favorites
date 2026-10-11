@@ -165,4 +165,11 @@ class ConfigTest extends TestCase {
 		$this->assertSame(['Votes' => 'Blog.Votes', 'Posts' => 'Posts'], Config::models(Config::TYPE_LIKE));
 	}
 
+	public function testReactionTypeNamesMayBeFlatAliases(): void {
+		Configure::write('Favorites.models', ['star' => 'Stars', 'like' => 'Likes', 'favorite' => 'Favorites']);
+		foreach ([Config::TYPE_STAR, Config::TYPE_LIKE, Config::TYPE_FAVORITE] as $type) {
+			$this->assertSame(['star' => 'Stars', 'like' => 'Likes', 'favorite' => 'Favorites'], Config::models($type));
+		}
+	}
+
 }

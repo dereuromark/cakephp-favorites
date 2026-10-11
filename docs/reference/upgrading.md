@@ -12,4 +12,15 @@ The `Starred` association is available without a user ID, so list queries can co
 
 Admin access is denied until `Favorites.adminAccess` returns literal `true` for the request. Check your application's authentication, authorization, and CSRF configuration after an upgrade.
 
-This audit targets the current CakePHP 5 APIs. It does not claim CakePHP 6 compatibility before that framework's API and the plugin's dependency constraints support it.
+
+## Existing behavior aliases
+
+Earlier `Likeable` and `Favoriteable` behaviors defaulted their stored `model` to the table alias. They now resolve the configured public alias. With `Articles => Posts`, old behavior rows may therefore use `Posts`, while new rows use `Articles`. Earlier plugin controllers may instead have saved a qualified table name such as `Blog.Posts`.
+
+Choose one alias for each reaction state. Back up the database, inspect the existing rows, and check for uniqueness conflicts before converting them. For an application where every `Posts` reaction should use `Articles`:
+
+```sql
+UPDATE favorites_favorites SET model = 'Articles' WHERE model = 'Posts';
+```
+
+Adapt both values to your application. Do not run this conversion when the old alias contains several reaction states that need separate aliases. You can temporarily preserve behavior lookups with an explicit `model => 'Posts'` behavior option while planning the data migration.

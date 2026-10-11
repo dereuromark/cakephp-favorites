@@ -94,4 +94,9 @@ class LikeableBehaviorTest extends TestCase {
 		$this->assertSame([], $this->table->find('likedBy', userId: 2)->all()->extract('id')->toList());
 	}
 
+	public function testDislikedFinderIsRegistered(): void {
+		$this->table->Favorites->add('Posts', 1, 1, -1);
+		$this->assertSame([1], $this->table->find('disliked')->all()->extract('id')->toList());
+	}
+
 }

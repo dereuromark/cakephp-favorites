@@ -26,11 +26,11 @@ Type-specific maps take precedence over matching flat aliases:
 
 Use these public aliases in helper calls. The plugin controllers resolve the table through the relevant type's map and store the alias. Behaviors detect a configured alias from their registry name, or use the table alias when none is configured. Set their `model` option explicitly if several aliases point to the same table.
 
-Changing aliases in an existing installation requires updating stored `model` values. Old installations may contain fully qualified table names saved by earlier plugin controllers; normalize those rows to your chosen alias before using the new helper flow.
+Changing aliases in an existing installation requires updating stored `model` values. Earlier controllers may have saved qualified table names, while older Likeable and Favoriteable behaviors used the table alias. See [Upgrading](./upgrading#existing-behavior-aliases) before changing either stored form to your public alias.
 
 ## User identity
 
-Controllers, components, and helpers recognize the authenticated request identity through its ArrayAccess `id` field. `Favorites.userIdField` changes the field name. The ID is cast to an integer because the favorites schema uses an integer `user_id`.
+Controllers, components, and helpers recognize the authenticated request identity through its ArrayAccess `id` field. `Favorites.userIdField` changes the field name. Identity IDs must be positive integers or decimal integer strings within PHP's integer range. Other values are treated as unauthenticated because the favorites schema uses an integer `user_id`.
 
 Legacy lookups also support configured values, TinyAuth's `AuthUser`, the controller's `Auth` component, and session data. The default session key is `Auth.User`, giving `Auth.User.id`. For CakeDC/Users session storage, configure `sessionKey => 'Auth'` if your application uses `Auth.id`. A session key is only useful when the application actually stores the user there; the Authentication plugin need not do so.
 

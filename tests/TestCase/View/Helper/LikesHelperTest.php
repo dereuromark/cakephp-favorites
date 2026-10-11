@@ -17,6 +17,11 @@ use PHPUnit\Framework\Attributes\UsesClass;
 class LikesHelperTest extends TestCase {
 
 	/**
+	 * @var list<string>
+	 */
+	protected array $fixtures = ['plugin.Favorites.Favorites'];
+
+	/**
 	 * @var \Favorites\View\Helper\LikesHelper
 	 */
 	protected LikesHelper $Likes;
@@ -140,6 +145,17 @@ class LikesHelperTest extends TestCase {
 	public function testIconRemove(): void {
 		$icon = $this->Likes->icon('Posts', 1, 0);
 		$this->assertSame('❌', $icon);
+	}
+
+	public function testWidgetPostsToTheLikesController(): void {
+		Configure::write('Auth.User.id', 1);
+		$view = new View();
+		$helper = new LikesHelper($view);
+		$helper->widget('Posts', 1);
+		$forms = $view->fetch('postLink');
+		$this->assertMatchesRegularExpression('#/favorites/(?:Likes|likes)/like/Posts/1#', $forms);
+		$this->assertMatchesRegularExpression('#/favorites/(?:Likes|likes)/dislike/Posts/1#', $forms);
+		$this->assertStringNotContainsString('/Stars/', $forms);
 	}
 
 }
