@@ -18,4 +18,4 @@ Adapt the role check to your application's actual identity. Keep its normal auth
 
 The index lists stored model names and supports resetting reactions for a configured model through a POST request. The listing page contains the configured `Users` association and allows individual deletions. Reset deletes rows in bulk; it does not recalculate host CounterCache columns.
 
-The backend templates currently expect a flat `Favorites.models` mapping for model names in reset controls. Use separate application administration if you configure only nested type-specific mappings. Do not assume that a model appearing in a type-specific frontend mapping is automatically supported by the reset screen.
+Reset accepts aliases from both flat and type-specific model maps. An unconfigured alias is rejected.

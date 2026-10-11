@@ -94,4 +94,11 @@ class FavoritesControllerTest extends TestCase {
 		$this->assertRedirect(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'index']);
 	}
 
+	public function testResetAllowsATypeSpecificModelAlias(): void {
+		Configure::write('Favorites.models', ['star' => ['Posts' => 'Posts']]);
+		$this->post(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'index', '?' => ['model' => 'Posts']]);
+		$this->assertRedirect();
+		$this->assertSame(0, $this->fetchTable('Favorites.Favorites')->find()->count());
+	}
+
 }

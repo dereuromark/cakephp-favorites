@@ -11,6 +11,7 @@ use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Response;
 use Cake\Log\Log;
 use Closure;
+use Favorites\Utility\Config;
 use Throwable;
 
 /**
@@ -80,7 +81,7 @@ class FavoritesController extends AppController {
 			// Whitelist against `Favorites.models` — without this, `reset()` happily issues
 			// `DELETE FROM favorites_favorites WHERE model = ''` for unmapped values, and the
 			// query parameter would pollute the i18n cache when concatenated into the translator call.
-			$allowed = array_keys((array)Configure::read('Favorites.models'));
+			$allowed = array_keys(Config::models(Config::TYPE_STAR) + Config::models(Config::TYPE_LIKE) + Config::models(Config::TYPE_FAVORITE));
 			if (!is_string($model) || !in_array($model, $allowed, true)) {
 				throw new BadRequestException('Invalid model');
 			}
