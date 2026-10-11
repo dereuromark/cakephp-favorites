@@ -161,7 +161,7 @@ class ConfigTest extends TestCase {
 			'like' => ['Votes' => 'Blog.Votes'],
 			'Posts' => 'Posts',
 		]);
-		$this->assertSame(['Posts' => 'Blog.Posts'], Config::models(Config::TYPE_STAR));
+		$this->assertSame(['Posts' => 'Posts'], Config::models(Config::TYPE_STAR));
 		$this->assertSame(['Votes' => 'Blog.Votes', 'Posts' => 'Posts'], Config::models(Config::TYPE_LIKE));
 	}
 
@@ -170,6 +170,18 @@ class ConfigTest extends TestCase {
 		foreach ([Config::TYPE_STAR, Config::TYPE_LIKE, Config::TYPE_FAVORITE] as $type) {
 			$this->assertSame(['star' => 'Stars', 'like' => 'Likes', 'favorite' => 'Favorites'], Config::models($type));
 		}
+	}
+
+	public function testSharedMapOverridesConflictsWithoutChangingFirstAliasOrder(): void {
+		Configure::write('Favorites.models', [
+			'star' => ['chosen' => 'OtherPosts', 'fallback' => 'Posts'],
+			'like' => ['Votes' => 'Votes'],
+			'chosen' => 'Posts',
+			'shared' => 'Posts',
+		]);
+
+		$this->assertSame(['chosen' => 'Posts', 'fallback' => 'Posts', 'shared' => 'Posts'], Config::models(Config::TYPE_STAR));
+		$this->assertSame('chosen', Config::alias('Posts', Config::TYPE_STAR));
 	}
 
 }

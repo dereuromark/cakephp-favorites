@@ -114,4 +114,18 @@ class StarsControllerTest extends TestCase {
 		$this->assertSame(1, $favorite->foreign_key);
 	}
 
+	public function testSharedAliasKeepsReleasedControllerStorageWhenTypeMapConflicts(): void {
+		Configure::write('Favorites.models', ['star' => ['Posts' => 'OtherPosts'], 'Posts' => 'Posts']);
+		$this->getTableLocator()->get('OtherPosts', ['table' => 'posts']);
+		$favorites = $this->fetchTable('Favorites.Favorites');
+		$favorites->deleteAll([]);
+		$this->session(['Auth.User.id' => 1]);
+
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => 'star', 'Posts', 1]);
+
+		$this->assertRedirect();
+		$this->assertSame('Posts', $favorites->find()->firstOrFail()->model);
+		$this->assertSame(0, $favorites->find()->where(['model' => 'OtherPosts'])->count());
+	}
+
 }

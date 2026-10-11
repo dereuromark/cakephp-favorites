@@ -68,7 +68,7 @@ class Config {
 	public static function models(string $type): array {
 		$models = (array)Configure::read('Favorites.models');
 		if (is_array($models[$type] ?? null)) {
-			return $models[$type] + array_filter($models, 'is_string');
+			return array_merge(array_filter($models[$type], 'is_string'), array_filter($models, 'is_string'));
 		}
 
 		return array_filter($models, 'is_string');

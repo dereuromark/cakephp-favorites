@@ -144,4 +144,24 @@ class LegacyStorageTest extends TestCase {
 		$this->assertCount(1, $post->get('favorites'));
 	}
 
+	public function testSharedMappingKeepsReleasedStarAliasAndHelperState(): void {
+		Configure::write('Favorites.models', [
+			'star' => ['chosen' => 'OtherPosts', 'fallback' => 'Posts'],
+			'chosen' => 'Posts',
+			'shared' => 'Posts',
+		]);
+		Configure::write('Auth.User.id', 1);
+		$table = $this->fetchTable('Posts');
+		$behavior = new StarableBehavior($table);
+		$this->assertSame('chosen', $behavior->getConfig('model'));
+		$this->assertSame(['Favorites.model' => 'chosen'], $table->getAssociation('Favorites')->getConditions());
+
+		$behavior->addStar(['modelId' => 1, 'userId' => 1]);
+		$helper = new StarsHelper(new View());
+		$this->assertTrue($helper->value('chosen', 1));
+		$this->assertFalse($helper->value('fallback', 1));
+		$behavior->removeStar(['modelId' => 1, 'userId' => 1]);
+		$this->assertFalse($helper->value('chosen', 1));
+	}
+
 }
