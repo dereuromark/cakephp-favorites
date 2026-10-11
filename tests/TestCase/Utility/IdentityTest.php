@@ -45,4 +45,15 @@ class IdentityTest extends TestCase {
 		}
 	}
 
+	public function testComponentAjaxRedirectUsesTheRequestHeader(): void {
+		foreach ([StarableComponent::class, LikeableComponent::class, FavoriteableComponent::class] as $class) {
+			$request = (new ServerRequest(['url' => '/posts/view/1']))->withHeader('X-Requested-With', 'XMLHttpRequest');
+			$controller = new Controller($request);
+			$component = new $class(new ComponentRegistry($controller));
+			$this->assertNull($component->prgRedirect());
+			$this->assertTrue($controller->viewBuilder()->getVar('ajaxMode'));
+			$this->assertSame($class === FavoriteableComponent::class ? [] : '/posts/view/1', $controller->viewBuilder()->getVar('redirect'));
+		}
+	}
+
 }
