@@ -42,7 +42,7 @@ class StarsHelper extends Helper {
 	/**
 	 * @var array<string, mixed>
 	 */
-	protected array $_defaultConfig = [
+	protected array $defaultConfig = [
 		'strategy' => Config::STRATEGY_CONTROLLER,
 		'html' => null,
 		'colorMap' => [],
@@ -120,7 +120,7 @@ class StarsHelper extends Helper {
 		$url = $this->url($action, $alias, $id);
 		$data = $this->data($action, $alias, $id);
 
-		return $this->Form->postLink($icon, $url, ['escapeTitle' => false, 'block' => true, 'data' => $data]);
+		return $this->Form->postLink($icon, $url, ['escape' => false, 'escapeAttributes' => true, 'block' => true, 'data' => $data]);
 	}
 
 	/**
@@ -174,7 +174,7 @@ class StarsHelper extends Helper {
 		$strategy = Config::strategy($this->getConfig('strategy'));
 
 		return match ($strategy) {
-			Config::STRATEGY_ACTION => $this->_View->getRequest()->getUri()->getPath(), //['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
+			Config::STRATEGY_ACTION => $this->View->getRequest()->getUri()->getPath(), //['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
 			Config::STRATEGY_CONTROLLER => ['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => $action, $alias, $id],
 			default => throw new BadMethodCallException('Not implemented: ' . $strategy),
 		};

@@ -16,7 +16,7 @@ class StarableBehavior extends Behavior {
 	 *
 	 * @var array<string, mixed>
 	 */
-	protected array $_defaultConfig = [
+	protected array $defaultConfig = [
 		'modelClass' => null, // Auto-detect
 		'favoriteClass' => 'Favorites.Favorites',
 		'userModelClass' => 'Users',
@@ -52,18 +52,18 @@ class StarableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$modelAlias = Config::alias($this->_table->getRegistryAlias(), Config::TYPE_STAR) ?: $this->_table->getAlias();
+			$modelAlias = Config::alias($this->table->getRegistryAlias(), Config::TYPE_STAR) ?: $this->table->getAlias();
 			$this->setConfig('model', $modelAlias);
 		}
 		if (!$this->getConfig('modelClass')) {
-			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
+			$this->setConfig('modelClass', $this->table->getRegistryAlias());
 		}
 		if (!$this->getConfig('userModel')) {
 			[, $userModelAlias] = pluginSplit($this->getConfig('userModelClass'));
 			$this->setConfig('userModel', $userModelAlias);
 		}
 
-		$this->_table->hasMany('Favorites', [
+		$this->table->hasMany('Favorites', [
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
@@ -88,7 +88,7 @@ class StarableBehavior extends Behavior {
 		if (!empty($config['userId'])) {
 			$starredConditions['Starred.user_id'] = $config['userId'];
 		}
-		$this->_table->hasOne('Starred', [
+		$this->table->hasOne('Starred', [
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'conditions' => $starredConditions,
@@ -97,7 +97,7 @@ class StarableBehavior extends Behavior {
 
 		if ($this->getConfig('counterCache')) {
 			$this->favoritesTable()->addBehavior('CounterCache', [
-				$this->_table->getAlias() => [
+				$this->table->getAlias() => [
 					$this->getConfig('fieldCounter') => [
 						'conditions' => ['Favorites.model' => $this->getConfig('model')],
 					],
@@ -164,7 +164,7 @@ class StarableBehavior extends Behavior {
 	 */
 	public function findStarred(SelectQuery $query): SelectQuery {
 		$subQuery = $this->buildStarredQuerySnippet();
-		$modelAlias = $this->_table->getAlias();
+		$modelAlias = $this->table->getAlias();
 
 		return $query->where([$modelAlias . '.id IN' => $subQuery]);
 	}
@@ -177,7 +177,7 @@ class StarableBehavior extends Behavior {
 	 */
 	public function findStarredBy(SelectQuery $query, int $userId): SelectQuery {
 		$subQuery = $this->buildStarredByQuerySnippet($userId);
-		$modelAlias = $this->_table->getAlias();
+		$modelAlias = $this->table->getAlias();
 
 		return $query->where([$modelAlias . '.id IN' => $subQuery]);
 	}
@@ -187,7 +187,7 @@ class StarableBehavior extends Behavior {
 	 */
 	protected function favoritesTable(): FavoritesTable {
 		/** @var \Favorites\Model\Table\FavoritesTable */
-		return $this->_table->Favorites->getTarget();
+		return $this->table->Favorites->getTarget();
 	}
 
 	/**

@@ -1,5 +1,19 @@
 # Upgrading
 
+## CakePHP 6 development branch
+
+Follow [Installation](../guide/installation.md) for PHP 8.5 and the development
+dependencies. Helpers and behaviors use native `defaultConfig`, `config`, `View`,
+`registry` and `table` properties where applicable. Entity field permissions use
+`patchable` and marshalling options use `patchableFields`.
+
+The favorites finder takes a named `id` argument. Use
+`$posts->find('favorites', id: $id)`; direct behavior calls pass the ID as the
+second argument. Overrides of `findFavorites()` must adopt the new
+`string|int|null $id = null` parameter. Behavior methods are accessed through
+`$posts->getBehavior('Favoriteable')`, since table method forwarding is removed.
+
+
 Back up the database and read the changes for your installed version before updating. Composer's constraints are the source for supported PHP and CakePHP versions; the [version map](https://github.com/dereuromark/cakephp-favorites/wiki#cakephp-version-map) describes older CakePHP branches.
 
 After updating the package, run the plugin migrations. The tightened unique index allows one reaction per user and record regardless of value. Existing duplicates must be reconciled before that migration can succeed.

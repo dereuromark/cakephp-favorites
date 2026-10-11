@@ -18,7 +18,7 @@ trait AuthTrait {
 		$userIdField = Configure::read('Favorites.userIdField') ?: 'id';
 		$sessionKey = Configure::read('Favorites.sessionKey') ?? 'Auth.User';
 
-		$identity = $this->_View->getRequest()->getAttribute('identity');
+		$identity = $this->View->getRequest()->getAttribute('identity');
 		if ($identity instanceof ArrayAccess && isset($identity[$userIdField])) {
 			return Config::userId($identity[$userIdField]);
 		}
@@ -29,7 +29,7 @@ trait AuthTrait {
 		}
 
 		/** @var \App\View\AppView $view */
-		$view = $this->_View;
+		$view = $this->View;
 		if ($view->helpers()->has('AuthUser')) {
 			$authUser = $view->helpers()->get('AuthUser');
 			if (method_exists($authUser, 'user')) {

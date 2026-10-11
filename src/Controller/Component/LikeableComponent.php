@@ -22,7 +22,7 @@ class LikeableComponent extends Component {
 	/**
 	 * @var array<string, mixed>
 	 */
-	protected array $_defaultConfig = [
+	protected array $defaultConfig = [
 		'on' => 'startup',
 		'userModelClass' => 'Users',
 		'userIdField' => 'id',

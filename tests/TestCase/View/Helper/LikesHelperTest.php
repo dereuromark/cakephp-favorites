@@ -36,7 +36,7 @@ class LikesHelperTest extends TestCase {
 
 		Router::createRouteBuilder('/')->scope('/', function (RouteBuilder $routes) {
 			$routes->setRouteClass(DashedRoute::class);
-			$routes->plugin('Favorites', ['path' => '/favorites'], function (RouteBuilder $builder) {
+			$routes->plugin('Favorites', function (RouteBuilder $builder) {
 				$builder->fallbacks();
 			});
 		});

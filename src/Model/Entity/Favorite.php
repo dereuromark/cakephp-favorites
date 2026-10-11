@@ -28,7 +28,7 @@ class Favorite extends Entity {
 	 *
 	 * @var array<string, bool>
 	 */
-	protected array $_accessible = [
+	protected array $patchable = [
 		'value' => true,
 		'id' => false,
 		'user_id' => false,

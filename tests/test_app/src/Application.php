@@ -26,7 +26,6 @@ class Application extends BaseApplication {
 
 		$routes->plugin(
 			'Favorites',
-			['path' => '/favorites'],
 			function (RouteBuilder $builder): void {
 				$builder->connect('/', ['controller' => 'Favorites', 'action' => 'index']);
 
@@ -37,7 +36,6 @@ class Application extends BaseApplication {
 		$routes->prefix('Admin', function (RouteBuilder $builder): void {
 			$builder->plugin(
 				'Favorites',
-				['path' => '/favorites'],
 				function (RouteBuilder $builder): void {
 					$builder->connect('/', ['controller' => 'Favorites', 'action' => 'index']);
 

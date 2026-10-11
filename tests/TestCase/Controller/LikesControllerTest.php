@@ -71,7 +71,7 @@ class LikesControllerTest extends TestCase {
 			->first();
 		$this->assertNotNull($row, 'A like row must have landed in the DB.');
 
-		$flash = $this->_requestSession->read('Flash.flash') ?? [];
+		$flash = $this->requestSession->read('Flash.flash') ?? [];
 		foreach ($flash as $message) {
 			$this->assertNotSame(
 				__d('favorites', 'Could not save like, please try again.'),

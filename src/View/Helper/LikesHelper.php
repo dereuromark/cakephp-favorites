@@ -42,7 +42,7 @@ class LikesHelper extends Helper {
 	/**
 	 * @var array<string, mixed>
 	 */
-	protected array $_defaultConfig = [
+	protected array $defaultConfig = [
 		'strategy' => Config::STRATEGY_CONTROLLER,
 		'html' => null,
 	];
@@ -122,7 +122,7 @@ class LikesHelper extends Helper {
 		$strategy = Config::strategy($this->getConfig('strategy'));
 
 		return match ($strategy) {
-			Config::STRATEGY_ACTION => $this->_View->getRequest()->getUri()->getPath(),
+			Config::STRATEGY_ACTION => $this->View->getRequest()->getUri()->getPath(),
 			Config::STRATEGY_CONTROLLER => ['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => $action, $alias, $id],
 			default => throw new BadMethodCallException('Not implemented: ' . $strategy),
 		};
