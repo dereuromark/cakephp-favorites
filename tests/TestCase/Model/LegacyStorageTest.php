@@ -125,22 +125,22 @@ class LegacyStorageTest extends TestCase {
 	/**
 	 * @return void
 	 */
-	public function testReleasedFinderOverrideSignatureRemainsCompatible(): void {
+	public function testNativeFinderOverride(): void {
 		$table = $this->fetchTable('Posts');
 		$behavior = new class ($table) extends FavoriteableBehavior {
 
 			/**
 			 * @param \Cake\ORM\Query\SelectQuery $query
-			 * @param array<string, mixed> $options
+			 * @param string|int|null $id
 			 *
 			 * @return \Cake\ORM\Query\SelectQuery
 			 */
-			public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
-				return parent::findFavorites($query, $options);
+			public function findFavorites(SelectQuery $query, string|int|null $id = null): SelectQuery {
+				return parent::findFavorites($query, $id);
 			}
 
 		};
-		$post = $behavior->findFavorites($table->find(), ['id' => 1])->firstOrFail();
+		$post = $behavior->findFavorites($table->find(), 1)->firstOrFail();
 		$this->assertCount(1, $post->get('favorites'));
 	}
 

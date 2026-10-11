@@ -1,20 +1,25 @@
 # Installation
 
+This development branch requires CakePHP 6 and PHP 8.5. Migrations currently
+uses the upstream CakePHP 6 compatibility branch.
+
 Install the plugin in an existing CakePHP application:
 
 ```bash
-composer require dereuromark/cakephp-favorites
+composer config minimum-stability dev
+composer config prefer-stable true
+composer require cakephp/cakephp:^6.0@dev dereuromark/cakephp-favorites:dev-cake6
 bin/cake plugin load Favorites
 ```
 
-Composer checks the package's PHP and CakePHP constraints. See [composer.json](https://github.com/dereuromark/cakephp-favorites/blob/master/composer.json) for the current supported versions.
+Composer checks the package's PHP and CakePHP constraints. See [composer.json](https://github.com/dereuromark/cakephp-favorites/blob/cake6/composer.json) for the current supported versions.
 
 ## Create the table
 
 If your application does not already use the Migrations plugin, install and load it:
 
 ```bash
-composer require cakephp/migrations
+composer require cakephp/migrations:dev-fix/6.x-cakephp-compatibility
 bin/cake plugin load Migrations
 ```
 

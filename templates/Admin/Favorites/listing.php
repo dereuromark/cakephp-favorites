@@ -56,7 +56,7 @@ $cspNonce = (string)$this->getRequest()->getAttribute('cspNonce', '');
 							$label = $this->Icon->render('delete');
 						}
 						echo $this->Form->postButton($label, ['action' => 'delete', $comment->id], [
-							'escapeTitle' => false,
+							'escape' => false, 'escapeAttributes' => true,
 							'class' => 'btn btn-link p-0 align-baseline',
 							'form' => [
 								'class' => 'd-inline',

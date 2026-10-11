@@ -42,7 +42,7 @@ class LikesHelper extends Helper {
 	/**
 	 * @var array<string, mixed>
 	 */
-	protected array $_defaultConfig = [
+	protected array $defaultConfig = [
 		'strategy' => Config::STRATEGY_CONTROLLER,
 		'html' => null,
 	];
@@ -92,7 +92,7 @@ class LikesHelper extends Helper {
 			$url = $this->url('remove', $alias, $id);
 			$data = $this->data('remove', $alias, $id);
 			$resetIcon = $this->icon($alias, $id, 0);
-			$options = ['escapeTitle' => false, 'block' => true, 'data' => $data];
+			$options = ['escape' => false, 'escapeAttributes' => true, 'block' => true, 'data' => $data];
 
 			return $icon . (' <details class="like-buttons"><summary>' . __d('favorites', 'Reset rating') . '</summary>' . $this->Form->postLink($resetIcon, $url, $options) . '</details>');
 		}
@@ -105,8 +105,8 @@ class LikesHelper extends Helper {
 		$dislikeData = $this->data('dislike', $alias, $id);
 
 		$icons = [];
-		$icons[] = $this->Form->postLink($likeIcon, $likeUrl, ['escapeTitle' => false, 'block' => true, 'data' => $likeData]);
-		$icons[] = $this->Form->postLink($disLikeIcon, $dislikeUrl, ['escapeTitle' => false, 'block' => true, 'data' => $dislikeData]);
+		$icons[] = $this->Form->postLink($likeIcon, $likeUrl, ['escape' => false, 'escapeAttributes' => true, 'block' => true, 'data' => $likeData]);
+		$icons[] = $this->Form->postLink($disLikeIcon, $dislikeUrl, ['escape' => false, 'escapeAttributes' => true, 'block' => true, 'data' => $dislikeData]);
 
 		return '<details class="like-buttons"><summary>' . __d('favorites', 'Rate me') . '</summary>' . implode(' ', $icons) . '</details>';
 	}
@@ -122,7 +122,7 @@ class LikesHelper extends Helper {
 		$strategy = Config::strategy($this->getConfig('strategy'));
 
 		return match ($strategy) {
-			Config::STRATEGY_ACTION => $this->_View->getRequest()->getUri()->getPath(),
+			Config::STRATEGY_ACTION => $this->View->getRequest()->getUri()->getPath(),
 			Config::STRATEGY_CONTROLLER => ['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => $action, $alias, $id],
 			default => throw new BadMethodCallException('Not implemented: ' . $strategy),
 		};

@@ -15,7 +15,7 @@ class LikeableBehavior extends Behavior {
 	 *
 	 * @var array<string, mixed>
 	 */
-	protected array $_defaultConfig = [
+	protected array $defaultConfig = [
 		'modelClass' => null, // Auto-detect
 		'favoriteClass' => 'Favorites.Favorites',
 		'userModelClass' => 'Users',
@@ -51,17 +51,17 @@ class LikeableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$this->setConfig('model', $this->_table->getAlias());
+			$this->setConfig('model', $this->table->getAlias());
 		}
 		if (!$this->getConfig('modelClass')) {
-			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
+			$this->setConfig('modelClass', $this->table->getRegistryAlias());
 		}
 		if (!$this->getConfig('userModel')) {
 			[, $alias] = pluginSplit($this->getConfig('userModelClass'));
 			$this->setConfig('userModel', $alias);
 		}
 
-		$this->_table->hasMany('Favorites', [
+		$this->table->hasMany('Favorites', [
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
@@ -70,7 +70,7 @@ class LikeableBehavior extends Behavior {
 		]);
 
 		if (!empty($config['userId'])) {
-			$this->_table->hasOne('Liked', [
+			$this->table->hasOne('Liked', [
 				'className' => $this->getConfig('favoriteClass'),
 				'foreignKey' => 'foreign_key',
 				'conditions' => ['Liked.model' => $this->getConfig('model'), 'Liked.user_id' => $config['userId']],
@@ -153,7 +153,7 @@ class LikeableBehavior extends Behavior {
 	 */
 	public function findLiked(SelectQuery $query): SelectQuery {
 		$subQuery = $this->buildLikedQuerySnippet(1);
-		$modelAlias = $this->_table->getAlias();
+		$modelAlias = $this->table->getAlias();
 
 		return $query->where([$modelAlias . '.id IN' => $subQuery]);
 	}
@@ -167,7 +167,7 @@ class LikeableBehavior extends Behavior {
 	 */
 	public function findDisliked(SelectQuery $query): SelectQuery {
 		$subQuery = $this->buildLikedQuerySnippet(-1);
-		$modelAlias = $this->_table->getAlias();
+		$modelAlias = $this->table->getAlias();
 
 		return $query->where([$modelAlias . '.id IN' => $subQuery]);
 	}
@@ -182,7 +182,7 @@ class LikeableBehavior extends Behavior {
 		$subQuery = $this->buildLikedQuerySnippet(1)
 			->where([$this->favoritesTable()->getAlias() . '.user_id' => $userId]);
 
-		return $query->where([$this->_table->getAlias() . '.id IN' => $subQuery]);
+		return $query->where([$this->table->getAlias() . '.id IN' => $subQuery]);
 	}
 
 	/**
@@ -190,7 +190,7 @@ class LikeableBehavior extends Behavior {
 	 */
 	protected function favoritesTable(): FavoritesTable {
 		/** @var \Favorites\Model\Table\FavoritesTable */
-		return $this->_table->Favorites->getTarget();
+		return $this->table->Favorites->getTarget();
 	}
 
 	/**

@@ -39,7 +39,7 @@ class FavoriteableBehavior extends Behavior {
 	 *
 	 * @var array<string, mixed>
 	 */
-	protected array $_defaultConfig = [
+	protected array $defaultConfig = [
 		'modelClass' => null, // Auto-detect
 		'favoriteClass' => 'Favorites.Favorites',
 		'userModelClass' => 'Users',
@@ -74,17 +74,17 @@ class FavoriteableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$this->setConfig('model', $this->_table->getAlias());
+			$this->setConfig('model', $this->table->getAlias());
 		}
 		if (!$this->getConfig('modelClass')) {
-			$this->setConfig('modelClass', $this->_table->getRegistryAlias());
+			$this->setConfig('modelClass', $this->table->getRegistryAlias());
 		}
 		if (!$this->getConfig('userModel')) {
 			[, $alias] = pluginSplit($this->getConfig('userModelClass'));
 			$this->setConfig('userModel', $alias);
 		}
 
-		$this->_table->hasMany('Favorites', [
+		$this->table->hasMany('Favorites', [
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
@@ -93,7 +93,7 @@ class FavoriteableBehavior extends Behavior {
 		]);
 
 		if (!empty($config['userId'])) {
-			$this->_table->hasOne('Favorite', [
+			$this->table->hasOne('Favorite', [
 				'className' => $this->getConfig('favoriteClass'),
 				'foreignKey' => 'foreign_key',
 				'conditions' => ['Favorite.model' => $this->getConfig('model'), 'Favorite.user_id' => $config['userId']],
@@ -156,13 +156,11 @@ class FavoriteableBehavior extends Behavior {
 	 * Create the finder favorites
 	 *
 	 * @param \Cake\ORM\Query\SelectQuery $query
-	 * @param array<string, mixed> $options
+	 * @param string|int|null $id
 	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
-	public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
-		$id = $options['id'] ?? null;
-
+	public function findFavorites(SelectQuery $query, string|int|null $id = null): SelectQuery {
 		return $query->contain([
 			'Favorites' => function (SelectQuery $q) use ($id) {
 				$q->contain('Users');
@@ -186,7 +184,7 @@ class FavoriteableBehavior extends Behavior {
 			->select(['foreign_key'])
 			->where(['model' => $this->getConfig('model'), 'user_id' => $userId]);
 
-		return $query->where([$this->_table->getAlias() . '.id IN' => $subQuery]);
+		return $query->where([$this->table->getAlias() . '.id IN' => $subQuery]);
 	}
 
 	/**
@@ -194,7 +192,7 @@ class FavoriteableBehavior extends Behavior {
 	 */
 	protected function favoritesTable(): FavoritesTable {
 		/** @var \Favorites\Model\Table\FavoritesTable */
-		return $this->_table->Favorites->getTarget();
+		return $this->table->Favorites->getTarget();
 	}
 
 }
