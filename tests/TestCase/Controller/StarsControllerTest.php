@@ -106,6 +106,7 @@ class StarsControllerTest extends TestCase {
 
 	public function testTypeSpecificAliasStoresTheAlias(): void {
 		Configure::write('Favorites.models', ['star' => ['Articles' => 'Posts']]);
+		$this->fetchTable('Favorites.Favorites')->deleteAll([]);
 		$this->session(['Auth.User.id' => 1]);
 		$this->post(['plugin' => 'Favorites', 'controller' => 'Stars', 'action' => 'star', 'Articles', 1]);
 		$this->assertRedirect();

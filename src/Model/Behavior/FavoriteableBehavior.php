@@ -89,7 +89,7 @@ class FavoriteableBehavior extends Behavior {
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
-			'conditions' => ['Favorites.model' => $this->getConfig('model')],
+			'conditions' => ['Favorites.model IN' => Config::storageModels($this->getConfig('model'))],
 			'dependent' => true,
 		]);
 
@@ -97,7 +97,7 @@ class FavoriteableBehavior extends Behavior {
 			$this->_table->hasOne('Favorite', [
 				'className' => $this->getConfig('favoriteClass'),
 				'foreignKey' => 'foreign_key',
-				'conditions' => ['Favorite.model' => $this->getConfig('model'), 'Favorite.user_id' => $config['userId']],
+				'conditions' => ['Favorite.model IN' => Config::storageModels($this->getConfig('model')), 'Favorite.user_id' => $config['userId']],
 				'dependent' => true,
 			]);
 		}
@@ -186,7 +186,7 @@ class FavoriteableBehavior extends Behavior {
 	public function findFavoritesBy(SelectQuery $query, int $userId): SelectQuery {
 		$subQuery = $this->favoritesTable()->find()
 			->select(['foreign_key'])
-			->where(['model' => $this->getConfig('model'), 'user_id' => $userId]);
+			->where(['model IN' => Config::storageModels($this->getConfig('model')), 'user_id' => $userId]);
 
 		return $query->where([$this->_table->getAlias() . '.id IN' => $subQuery]);
 	}

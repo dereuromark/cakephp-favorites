@@ -75,6 +75,41 @@ class Config {
 	}
 
 	/**
+	 * @param string $alias
+	 *
+	 * @return list<string>
+	 */
+	public static function storageModels(string $alias): array {
+		$maps = [static::models(static::TYPE_STAR), static::models(static::TYPE_LIKE), static::models(static::TYPE_FAVORITE)];
+		$targets = [];
+		foreach ($maps as $map) {
+			if (isset($map[$alias])) {
+				$targets[] = $map[$alias];
+			}
+		}
+		$targets = array_values(array_unique($targets));
+		if (count($targets) !== 1) {
+			return [$alias];
+		}
+		$target = $targets[0];
+		[, $tableAlias] = pluginSplit($target);
+		$result = [$alias];
+		foreach (array_unique([$target, $tableAlias]) as $legacy) {
+			foreach ($maps as $map) {
+				foreach ($map as $key => $model) {
+					[, $otherAlias] = pluginSplit($model);
+					if ($model !== $target && ($key === $legacy || $otherAlias === $legacy)) {
+						continue 3;
+					}
+				}
+			}
+			$result[] = $legacy;
+		}
+
+		return array_values(array_unique($result));
+	}
+
+	/**
 	 * @param mixed $value
      *
 	 * @return int|null

@@ -66,7 +66,7 @@ class LikeableBehavior extends Behavior {
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
-			'conditions' => ['Favorites.model' => $this->getConfig('model')],
+			'conditions' => ['Favorites.model IN' => Config::storageModels($this->getConfig('model'))],
 			'dependent' => true,
 		]);
 
@@ -74,7 +74,7 @@ class LikeableBehavior extends Behavior {
 			$this->_table->hasOne('Liked', [
 				'className' => $this->getConfig('favoriteClass'),
 				'foreignKey' => 'foreign_key',
-				'conditions' => ['Liked.model' => $this->getConfig('model'), 'Liked.user_id' => $config['userId']],
+				'conditions' => ['Liked.model IN' => Config::storageModels($this->getConfig('model')), 'Liked.user_id' => $config['userId']],
 				'dependent' => true,
 			]);
 		}
@@ -202,7 +202,7 @@ class LikeableBehavior extends Behavior {
 	protected function buildLikedQuerySnippet(int $value): SelectQuery {
 		$model = $this->getConfig('model');
 		$conditions = [
-			$this->favoritesTable()->getAlias() . '.model' => $model,
+			$this->favoritesTable()->getAlias() . '.model IN' => Config::storageModels($model),
 			$this->favoritesTable()->getAlias() . '.value' => $value,
 		];
 

@@ -67,7 +67,7 @@ class StarableBehavior extends Behavior {
 			'className' => $this->getConfig('favoriteClass'),
 			'foreignKey' => 'foreign_key',
 			'order' => 'Favorites.created DESC',
-			'conditions' => ['Favorites.model' => $this->getConfig('model')],
+			'conditions' => ['Favorites.model IN' => Config::storageModels($this->getConfig('model'))],
 			'dependent' => true,
 		]);
 
@@ -84,7 +84,7 @@ class StarableBehavior extends Behavior {
 		// implementation gated the whole `hasOne` on `userId`, so any
 		// controller that didn't know a user up-front lost the Starred
 		// association entirely.
-		$starredConditions = ['Starred.model' => $this->getConfig('model')];
+		$starredConditions = ['Starred.model IN' => Config::storageModels($this->getConfig('model'))];
 		if (!empty($config['userId'])) {
 			$starredConditions['Starred.user_id'] = $config['userId'];
 		}
@@ -99,7 +99,7 @@ class StarableBehavior extends Behavior {
 			$this->favoritesTable()->addBehavior('CounterCache', [
 				$this->_table->getAlias() => [
 					$this->getConfig('fieldCounter') => [
-						'conditions' => ['Favorites.model' => $this->getConfig('model')],
+						'conditions' => ['Favorites.model IN' => Config::storageModels($this->getConfig('model'))],
 					],
 				],
 			]);
@@ -196,7 +196,7 @@ class StarableBehavior extends Behavior {
 	protected function buildStarredQuerySnippet(): SelectQuery {
 		$model = $this->getConfig('model');
 		$conditions = [
-			$this->favoritesTable()->getAlias() . '.model' => $model,
+			$this->favoritesTable()->getAlias() . '.model IN' => Config::storageModels($model),
 		];
 
 		return $this->favoritesTable()->find()
@@ -212,7 +212,7 @@ class StarableBehavior extends Behavior {
 	protected function buildStarredByQuerySnippet(int $userId): SelectQuery {
 		$model = $this->getConfig('model');
 		$conditions = [
-			$this->favoritesTable()->getAlias() . '.model' => $model,
+			$this->favoritesTable()->getAlias() . '.model IN' => Config::storageModels($model),
 			$this->favoritesTable()->getAlias() . '.user_id' => $userId,
 		];
 

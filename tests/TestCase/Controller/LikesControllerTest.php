@@ -154,12 +154,23 @@ class LikesControllerTest extends TestCase {
 
 	public function testTypeSpecificAliasStoresTheAlias(): void {
 		Configure::write('Favorites.models', ['like' => ['Articles' => 'Posts']]);
+		$this->fetchTable('Favorites.Favorites')->deleteAll([]);
 		$this->session(['Auth.User.id' => 1]);
 		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Articles', 1]);
 		$this->assertRedirect();
 		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Articles'])->firstOrFail();
 		$this->assertSame(1, $favorite->foreign_key);
 		$this->assertSame(1, $favorite->value);
+	}
+
+	public function testLegacyTableAliasIsUpdatedWithoutDuplicate(): void {
+		Configure::write('Favorites.models', ['like' => ['Articles' => 'Posts']]);
+		$this->session(['Auth.User.id' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Articles', 1]);
+		$this->assertRedirect();
+		$favorites = $this->fetchTable('Favorites.Favorites');
+		$this->assertSame(0, $favorites->find()->where(['model' => 'Articles'])->count());
+		$this->assertSame(1, $favorites->find()->where(['model' => 'Posts', 'foreign_key' => 1, 'user_id' => 1])->count());
 	}
 
 }

@@ -296,7 +296,7 @@ class FavoriteableComponent extends Component {
 		$options = [
 			'userId' => $this->userId(),
 			'modelId' => $modelId,
-			'model' => $alias,
+			'model IN' => Config::storageModels($alias),
 			'value' => $rawValue !== null ? (int)$rawValue : null,
 		];
 		$action = $actionName === 'remove' ? 'removeFavorite' : 'addFavorite';

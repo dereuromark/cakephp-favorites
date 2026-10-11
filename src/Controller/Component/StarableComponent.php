@@ -269,7 +269,7 @@ class StarableComponent extends Component {
 		$options = [
 			'userId' => $this->userId(),
 			'modelId' => $modelId,
-			'model' => $alias,
+			'model IN' => Config::storageModels($alias),
 		];
 		$action = $actionName === 'unstar' ? 'removeStar' : 'addStar';
 

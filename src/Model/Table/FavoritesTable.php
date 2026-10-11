@@ -7,6 +7,7 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Favorites\Model\Entity\Favorite;
+use Favorites\Utility\Config;
 
 /**
  * Favorites Model
@@ -91,7 +92,16 @@ class FavoritesTable extends Table {
 			'user_id' => $userId,
 		];
 
-		$favorite = $this->findOrCreate($data);
+		$favorite = null;
+		foreach (Config::storageModels($model) as $storedModel) {
+			$existing = $this->find()->select(['id'])->where(['model' => $storedModel, 'foreign_key' => $foreignKey, 'user_id' => $userId])->first();
+			if ($existing !== null) {
+				$favorite = $this->get($existing->get('id'));
+
+				break;
+			}
+		}
+		$favorite ??= $this->findOrCreate($data);
 		if ($favorite->hasErrors()) {
 			return $favorite;
 		}
@@ -117,6 +127,9 @@ class FavoritesTable extends Table {
 			'user_id' => $userId,
 		];
 
+		unset($data['model']);
+		$data['model IN'] = Config::storageModels($model);
+
 		$count = 0;
 		foreach ($this->find()->where($data) as $favorite) {
 			if ($this->delete($favorite)) {
@@ -133,7 +146,7 @@ class FavoritesTable extends Table {
 	 * @return int
 	 */
 	public function reset(string $model): int {
-		return $this->deleteAll(['model' => $model]);
+		return $this->deleteAll(['model IN' => Config::storageModels($model)]);
 	}
 
 }

@@ -221,7 +221,7 @@ class LikesHelper extends Helper {
 		$entity = $table->find()
 			->select(['id', 'value'])
 			->where([
-				'model' => $alias,
+				'model IN' => Config::storageModels($alias),
 				'foreign_key' => $id,
 				'user_id' => $uid,
 			])->first();
