@@ -121,7 +121,7 @@ class FavoritesTableTest extends TestCase {
 		// Wipe the fixture row so the asserts measure the constraint, not it.
 		$this->Favorites->deleteAll(['1=1']);
 
-		// Build directly via set(guard=false) — the entity's `_accessible`
+		// Build directly via set(guard=false) — the entity's `$patchable`
 		// allowlist blocks mass-assign of identity columns by design
 		// (those are set server-side via FavoritesTable::add).
 		$first = $this->Favorites->newEmptyEntity();

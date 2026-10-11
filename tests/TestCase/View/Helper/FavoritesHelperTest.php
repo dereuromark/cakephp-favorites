@@ -74,4 +74,21 @@ class FavoritesHelperTest extends TestCase {
 		$this->assertEquals($expected, $result);
 	}
 
+	/**
+	 * @return void
+	 */
+	public function testWidgetRendersIconMarkup(): void {
+		$this->Favorites = $this->getMockBuilder(FavoritesHelper::class)
+			->setConstructorArgs([new View(), ['icons' => [1 => '<span class="custom-icon">Yes</span>'], 'resetIcon' => '<span class="reset-icon">Reset</span>']])
+			->onlyMethods(['value'])
+			->getMock();
+		$this->Favorites->expects($this->exactly(2))->method('value')->willReturn(null);
+		$html = $this->Favorites->widget('Posts', 1);
+		$this->assertStringContainsString('<span class="custom-icon">Yes</span>', $html);
+		$this->assertStringNotContainsString('&lt;span', $html);
+		$html = $this->Favorites->widget('Posts', 1, 1);
+		$this->assertStringContainsString('<span class="reset-icon">Reset</span>', $html);
+		$this->assertStringNotContainsString('&lt;span', $html);
+	}
+
 }

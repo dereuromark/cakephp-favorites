@@ -18,7 +18,7 @@ Back up the database and read the changes for your installed version before upda
 
 After updating the package, run the plugin migrations. The tightened unique index allows one reaction per user and record regardless of value. Existing duplicates must be reconciled before that migration can succeed.
 
-Use CakePHP's named finder arguments: `find('starredBy', userId: $userId)`, `find('likedBy', userId: $userId)`, and `find('favorites', id: $postId)`. The `favorites` finder retains its existing options parameter, including direct calls from subclasses.
+Use CakePHP's named finder arguments: `find('starredBy', userId: $userId)`, `find('likedBy', userId: $userId)`, and `find('favorites', id: $postId)`. Direct behavior calls pass the ID as the second argument: `$behavior->findFavorites($query, $id)`.
 
 The `Starred` association is available without a user ID, so list queries can contain it with an explicit user condition. `Liked` and `Favorite` are still created only when a user ID is supplied to the corresponding behavior.
 

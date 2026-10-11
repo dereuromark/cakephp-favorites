@@ -158,4 +158,22 @@ class LikesHelperTest extends TestCase {
 		$this->assertStringNotContainsString('/Stars/', $forms);
 	}
 
+	/**
+	 * @return void
+	 */
+	public function testWidgetRendersIconMarkup(): void {
+		$this->Likes = $this->getMockBuilder(LikesHelper::class)
+			->setConstructorArgs([new View(), ['html' => [1 => '<span class="like-icon">Yes</span>', -1 => '<span class="dislike-icon">No</span>', 0 => '<span class="reset-icon">Reset</span>']]])
+			->onlyMethods(['value'])
+			->getMock();
+		$this->Likes->expects($this->exactly(2))->method('value')->willReturn(null);
+		$html = $this->Likes->widget('Posts', 1);
+		$this->assertStringContainsString('<span class="like-icon">Yes</span>', $html);
+		$this->assertStringContainsString('<span class="dislike-icon">No</span>', $html);
+		$this->assertStringNotContainsString('&lt;span', $html);
+		$html = $this->Likes->widget('Posts', 1, 1);
+		$this->assertStringContainsString('<span class="reset-icon">Reset</span>', $html);
+		$this->assertStringNotContainsString('&lt;span', $html);
+	}
+
 }

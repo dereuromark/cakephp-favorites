@@ -12,7 +12,7 @@ composer require cakephp/cakephp:^6.0@dev dereuromark/cakephp-favorites:dev-cake
 bin/cake plugin load Favorites
 ```
 
-Composer checks the package's PHP and CakePHP constraints. See [composer.json](https://github.com/dereuromark/cakephp-favorites/blob/master/composer.json) for the current supported versions.
+Composer checks the package's PHP and CakePHP constraints. See [composer.json](https://github.com/dereuromark/cakephp-favorites/blob/cake6/composer.json) for the current supported versions.
 
 ## Create the table
 

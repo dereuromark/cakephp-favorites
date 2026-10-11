@@ -85,7 +85,7 @@ class FavoritesHelper extends Helper {
 			$url = $this->url('remove', $alias, $id);
 			$data = $this->data('remove', $alias, $id);
 			$resetIcon = $this->icon($alias, $id, 0);
-			$options = ['escapeTitle' => false, 'block' => true, 'data' => $data];
+			$options = ['escape' => false, 'escapeAttributes' => true, 'block' => true, 'data' => $data];
 
 			return $icon . (' <details class="like-buttons"><summary>' . __d('favorites', 'Remove reaction') . '</summary>' . $this->Form->postLink($resetIcon, $url, $options) . '</details>');
 		}
@@ -102,7 +102,7 @@ class FavoritesHelper extends Helper {
 			$html = $this->icon($alias, $id, $value);
 			$url = $this->url('add', $alias, $id);
 			$data = $this->data('add', $alias, $id, $value);
-			$iconList[] = $this->Form->postLink($html, $url, ['escapeTitle' => false, 'block' => true, 'data' => $data]);
+			$iconList[] = $this->Form->postLink($html, $url, ['escape' => false, 'escapeAttributes' => true, 'block' => true, 'data' => $data]);
 		}
 
 		return '<details class="like-buttons"><summary>' . __d('favorites', 'Add reaction') . '</summary>' . implode(' ', $iconList) . '</details>';
