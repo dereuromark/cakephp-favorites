@@ -157,7 +157,7 @@ class FavoriteableBehavior extends Behavior {
 	 *
 	 * @param \Cake\ORM\Query\SelectQuery $query
 	 * @param array<string, mixed> $options
-		 *
+	 *
 	 * @return \Cake\ORM\Query\SelectQuery
 	 */
 	public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
