@@ -51,7 +51,7 @@ class StarsController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to add star');
 		}
 
-		$result = $this->Favorites->add($alias, $entity->get('id'), $uid);
+		$result = $this->Favorites->add($model, $entity->get('id'), $uid);
 		if ($result->hasErrors()) {
 			$this->Flash->error(__d('favorites', 'Could not save star, please try again.'));
 		}
@@ -80,7 +80,7 @@ class StarsController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to remove star');
 		}
 
-		$this->Favorites->remove($alias, $entity->get('id'), $uid);
+		$this->Favorites->remove($model, $entity->get('id'), $uid);
 
 		return $this->redirect($this->referer(['action' => 'index']));
 	}

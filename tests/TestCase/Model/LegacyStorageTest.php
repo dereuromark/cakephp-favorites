@@ -3,14 +3,17 @@
 namespace Favorites\Test\TestCase\Model;
 
 use Cake\Core\Configure;
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
-use Favorites\Utility\Config;
+use Favorites\Model\Behavior\FavoriteableBehavior;
+use Favorites\Model\Behavior\LikeableBehavior;
+use Favorites\Model\Behavior\StarableBehavior;
 use Favorites\View\Helper\FavoritesHelper;
 use Favorites\View\Helper\LikesHelper;
 use Favorites\View\Helper\StarsHelper;
-use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class LegacyStorageTest extends TestCase {
 
@@ -20,93 +23,123 @@ class LegacyStorageTest extends TestCase {
 	protected array $fixtures = ['plugin.Favorites.Favorites', 'plugin.Favorites.Users', 'plugin.Favorites.Posts'];
 
 	/**
+	 * @return array<string, array<string>>
+	 */
+	public static function behaviors(): array {
+		return [
+			'favorites' => [FavoriteableBehavior::class],
+			'likes' => [LikeableBehavior::class],
+			'stars' => [StarableBehavior::class],
+		];
+	}
+
+	/**
+	 * @param class-string<\Cake\ORM\Behavior> $behaviorClass
+	 *
 	 * @return void
 	 */
-	public function testLegacyModelKeysRemainVisibleAndUpdatesDoNotDuplicate(): void {
-		Configure::write('Favorites.models', ['article' => 'Blog.Posts']);
-		Configure::write('Favorites.legacyModels', ['article' => ['Blog.Posts', 'Posts']]);
-		$favorites = $this->fetchTable('Favorites.Favorites');
-		$favorites->deleteAll([]);
-		foreach (['Blog.Posts', 'Posts', 'article'] as $storedModel) {
-			$favorite = $favorites->add($storedModel, 1, 1, 1);
-			$this->assertSame($favorite->get('id'), $favorites->add('article', 1, 1, 2)->get('id'));
-			$this->assertSame(1, $favorites->find()->count());
-			$this->assertSame(2, $favorites->get($favorite->get('id'))->get('value'));
-			$favorites->remove('article', 1, 1);
-			$this->assertSame(0, $favorites->find()->count());
-		}
+	#[DataProvider('behaviors')]
+	public function testDefaultModelKeepsReleasedTableAlias(string $behaviorClass): void {
+		Configure::write('Favorites.models', ['wish' => 'Blog.Posts', 'bookmark' => 'Blog.Posts']);
+		$table = $this->getTableLocator()->get('Blog.Posts', ['className' => Table::class, 'table' => 'posts']);
+		$behavior = new $behaviorClass($table);
+		$this->assertSame('Posts', $behavior->getConfig('model'));
+		$this->assertSame(['Favorites.model' => 'Posts'], $table->getAssociation('Favorites')->getConditions());
+		$this->assertCount(1, $table->find()->contain('Favorites')->firstOrFail()->get('favorites'));
+	}
+
+	/**
+	 * @param class-string<\Cake\ORM\Behavior> $behaviorClass
+	 *
+	 * @return void
+	 */
+	#[DataProvider('behaviors')]
+	public function testExplicitModelKeepsItsStorageKey(string $behaviorClass): void {
+		Configure::write('Favorites.models', ['wish' => 'Blog.Posts', 'bookmark' => 'Blog.Posts']);
+		$table = $this->getTableLocator()->get('Blog.Posts', ['className' => Table::class, 'table' => 'posts']);
+		$behavior = new $behaviorClass($table, ['model' => 'WishlistedPosts']);
+		$this->assertSame('WishlistedPosts', $behavior->getConfig('model'));
+		$this->assertSame(['Favorites.model' => 'WishlistedPosts'], $table->getAssociation('Favorites')->getConditions());
+		$this->assertCount(0, $table->find()->contain('Favorites')->firstOrFail()->get('favorites'));
 	}
 
 	/**
 	 * @return void
 	 */
-	public function testLegacyKeysWorkInBehaviorFindersAndHelpers(): void {
-		Configure::write('Favorites.models', ['article' => 'Blog.Posts']);
-		Configure::write('Favorites.legacyModels', ['article' => ['Blog.Posts', 'Posts']]);
+	public function testSeparateRelationsOnSameTableKeepIndependentRows(): void {
+		Configure::write('Favorites.models', ['WishlistedPosts' => 'WishlistedPosts', 'BookmarkedPosts' => 'BookmarkedPosts']);
 		Configure::write('Auth.User.id', 1);
-		$posts = $this->getTableLocator()->get('Blog.Posts', ['className' => Table::class, 'table' => 'posts']);
-		$posts->addBehavior('Favorites.Favoriteable');
+		$wishlisted = $this->getTableLocator()->get('WishlistedPosts', ['className' => Table::class, 'table' => 'posts']);
+		$bookmarked = $this->getTableLocator()->get('BookmarkedPosts', ['className' => Table::class, 'table' => 'posts']);
+		$wishlisted->addBehavior('Favorites.Favoriteable');
+		$bookmarked->addBehavior('Favorites.Favoriteable');
+		$this->assertSame($wishlisted->getTable(), $bookmarked->getTable());
+		$this->assertSame(get_class($wishlisted), get_class($bookmarked));
+		$wishlisted->getBehavior('Favoriteable')->addFavorite(['modelId' => 1, 'userId' => 1, 'value' => 1]);
+		$bookmarked->getBehavior('Favoriteable')->addFavorite(['modelId' => 1, 'userId' => 1, 'value' => 2]);
+		$helper = new FavoritesHelper(new View());
+		$this->assertSame(1, $helper->value('WishlistedPosts', 1));
+		$this->assertSame(2, $helper->value('BookmarkedPosts', 1));
+		$this->assertCount(1, $wishlisted->find('favorites')->firstOrFail()->get('favorites'));
+		$this->assertCount(1, $bookmarked->find('favorites')->firstOrFail()->get('favorites'));
+		$wishlisted->getBehavior('Favoriteable')->removeFavorite(['modelId' => 1, 'userId' => 1]);
+		$this->assertNull($helper->value('WishlistedPosts', 1));
+		$this->assertSame(2, $helper->value('BookmarkedPosts', 1));
+	}
+
+	/**
+	 * @return array<string, array<string>>
+	 */
+	public static function helpers(): array {
+		return [
+			'favorites' => [FavoritesHelper::class],
+			'likes' => [LikesHelper::class],
+			'stars' => [StarsHelper::class],
+		];
+	}
+
+	/**
+	 * @param class-string<\Cake\View\Helper> $helperClass
+	 *
+	 * @return void
+	 */
+	#[DataProvider('helpers')]
+	public function testHelperModelFactoryStillSuppliesReactionRepository(string $helperClass): void {
+		Configure::write('Auth.User.id', 1);
 		$favorites = $this->fetchTable('Favorites.Favorites');
-		$favorites->deleteAll([]);
-		$favorites->add('Blog.Posts', 1, 1, 1);
-		$this->assertSame(1, $posts->find('favoritesBy', userId: 1)->count());
-		$this->assertCount(1, $posts->find('favorites')->firstOrFail()->get('favorites'));
-		$this->assertSame(1, (new FavoritesHelper(new View()))->value('article', 1));
-		$this->assertSame(1, (new LikesHelper(new View()))->value('article', 1));
-		$this->assertTrue((new StarsHelper(new View()))->value('article', 1));
+		$favorites->add('Posts', 1, 1, 1);
+		$helper = new $helperClass(new View());
+		$calls = [];
+		$helper->modelFactory('Table', function (string $alias) use ($favorites, &$calls): Table {
+			$calls[] = $alias;
+
+			return $favorites;
+		});
+		$this->assertEquals(1, $helper->value('Posts', 1));
+		$this->assertSame(['Favorites.Favorites'], $calls);
+		$this->assertSame($favorites, $helper->fetchModel('Favorites.Favorites'));
 	}
 
 	/**
 	 * @return void
 	 */
-	public function testAmbiguousLegacyAliasesCannotCrossModelBoundaries(): void {
-		Configure::write('Favorites.models', ['article' => 'Blog.Posts', 'product' => 'Shop.Posts']);
-		$this->assertSame(['article'], Config::storageModels('article'));
-		Configure::write('Favorites.legacyModels', ['article' => ['Blog.Posts']]);
-		$this->assertSame(['article', 'Blog.Posts'], Config::storageModels('article'));
-		$favorites = $this->fetchTable('Favorites.Favorites');
-		$favorites->add('Shop.Posts', 1, 1, 1);
-		$this->assertSame(0, $favorites->remove('article', 1, 1));
-		$this->assertSame(1, $favorites->find()->where(['model' => 'Shop.Posts'])->count());
-		$this->assertSame(1, $favorites->find()->where(['model' => 'Posts'])->count());
-		Configure::delete('Favorites.legacyModels');
-		Configure::write('Favorites.models', ['like' => ['article' => 'Blog.Posts'], 'star' => ['article' => 'Shop.Posts']]);
-		$this->assertSame(['article'], Config::storageModels('article'));
-	}
+	public function testReleasedFinderOverrideSignatureRemainsCompatible(): void {
+		$table = $this->fetchTable('Posts');
+		$behavior = new class ($table) extends FavoriteableBehavior {
 
-	/**
-	 * @return void
-	 */
-	public function testUpdatingReactionReconcilesCanonicalAndLegacyDuplicates(): void {
-		$favorites = $this->fetchTable('Favorites.Favorites');
-		$favorites->deleteAll([]);
-		$legacy = $favorites->add('Posts', 1, 1, 1);
-		$canonical = $favorites->add('article', 1, 1, -1);
-		Configure::write('Favorites.legacyModels', ['article' => ['Posts']]);
-		$updated = $favorites->add('article', 1, 1, 1);
-		$this->assertSame($canonical->get('id'), $updated->get('id'));
-		$this->assertSame(1, $favorites->find()->count());
-		$this->assertFalse($favorites->exists(['id' => $legacy->get('id')]));
-		$this->assertSame(1, $updated->get('value'));
-	}
+			/**
+			 * @param \Cake\ORM\Query\SelectQuery $query
+			 * @param array<string, mixed> $options
+			 *
+			 * @return \Cake\ORM\Query\SelectQuery
+			 */
+			public function findFavorites(SelectQuery $query, array $options = []): SelectQuery {
+				return parent::findFavorites($query, $options);
+			}
 
-	/**
-	 * @return void
-	 */
-	public function testLegacyNameCannotBelongToSeveralReactionAliases(): void {
-		Configure::write('Favorites.legacyModels', ['liked' => ['Posts'], 'starred' => ['Posts']]);
-		$this->expectException(InvalidArgumentException::class);
-		Config::storageModels('liked');
-	}
-
-	/**
-	 * @return void
-	 */
-	public function testLegacyNameCannotBeAnActivePublicAlias(): void {
-		Configure::write('Favorites.models', ['article' => 'Blog.Posts', 'Posts' => 'Shop.Posts']);
-		Configure::write('Favorites.legacyModels', ['article' => ['Posts']]);
-		$this->expectException(InvalidArgumentException::class);
-		Config::storageModels('article');
+		};
+		$post = $behavior->findFavorites($table->find(), ['id' => 1])->firstOrFail();
+		$this->assertCount(1, $post->get('favorites'));
 	}
 
 }

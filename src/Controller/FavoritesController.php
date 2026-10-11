@@ -60,7 +60,7 @@ class FavoritesController extends AppController {
 			throw new InvalidArgumentException('Missing value for Favorite ' . $alias . ':' . $id);
 		}
 
-		$result = $this->Favorites->add($alias, $entity->get('id'), $uid, $value);
+		$result = $this->Favorites->add($model, $entity->get('id'), $uid, $value);
 		if ($result->hasErrors()) {
 			$this->Flash->error(__d('favorites', 'Could not save favorite, please try again.'));
 		}
@@ -89,7 +89,7 @@ class FavoritesController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to remove favorite');
 		}
 
-		$this->Favorites->remove($alias, $entity->get('id'), $uid);
+		$this->Favorites->remove($model, $entity->get('id'), $uid);
 
 		return $this->redirect($this->referer(['action' => 'index']));
 	}

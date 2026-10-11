@@ -16,8 +16,6 @@ return [
 		'models' => [
 			'Alias' => 'MyPlugin.MyModel',
 		],
-		// Optional verified legacy storage names for each public alias.
-		'legacyModels' => [],
 		'userIdField' => 'id',
 
 		// Session key used to look up the current user id when no auth component

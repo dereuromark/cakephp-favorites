@@ -39,7 +39,7 @@ Allow `Posts` in `Favorites.models` and render the `postLink` block outside othe
 ## Finders
 
 ```php
-$posts->find('favorites', id: $postId);
+$posts->find('favorites', options: ['id' => $postId]);
 $posts->find('favoritesBy', userId: $userId);
 ```
 

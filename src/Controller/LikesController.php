@@ -51,7 +51,7 @@ class LikesController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to add like');
 		}
 
-		$result = $this->Favorites->add($alias, $entity->get('id'), $uid, 1);
+		$result = $this->Favorites->add($model, $entity->get('id'), $uid, 1);
 		if ($result->hasErrors()) {
 			$this->Flash->error(__d('favorites', 'Could not save like, please try again.'));
 		}
@@ -80,7 +80,7 @@ class LikesController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to add dislike');
 		}
 
-		$result = $this->Favorites->add($alias, $entity->get('id'), $uid, -1);
+		$result = $this->Favorites->add($model, $entity->get('id'), $uid, -1);
 		if ($result->hasErrors()) {
 			$this->Flash->error(__d('favorites', 'Could not save dislike, please try again.'));
 		}
@@ -109,7 +109,7 @@ class LikesController extends AppController {
 			throw new MethodNotAllowedException('Must be logged in to remove like/dislike');
 		}
 
-		$this->Favorites->remove($alias, $entity->get('id'), $uid);
+		$this->Favorites->remove($model, $entity->get('id'), $uid);
 
 		return $this->redirect($this->referer(['action' => 'index']));
 	}

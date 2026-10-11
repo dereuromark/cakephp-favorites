@@ -81,7 +81,8 @@ class FavoritesController extends AppController {
 			// Whitelist against `Favorites.models` — without this, `reset()` happily issues
 			// `DELETE FROM favorites_favorites WHERE model = ''` for unmapped values, and the
 			// query parameter would pollute the i18n cache when concatenated into the translator call.
-			$allowed = array_keys(Config::models(Config::TYPE_STAR) + Config::models(Config::TYPE_LIKE) + Config::models(Config::TYPE_FAVORITE));
+			$configured = Config::models(Config::TYPE_STAR) + Config::models(Config::TYPE_LIKE) + Config::models(Config::TYPE_FAVORITE);
+			$allowed = array_merge(array_keys($configured), array_values($configured));
 			if (!is_string($model) || !in_array($model, $allowed, true)) {
 				throw new BadRequestException('Invalid model');
 			}

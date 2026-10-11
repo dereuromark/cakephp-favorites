@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Favorites\Test\TestCase\Controller;
 
 use Cake\Core\Configure;
+use Cake\ORM\Table;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 use Favorites\Controller\LikesController;
@@ -152,19 +153,18 @@ class LikesControllerTest extends TestCase {
 		$this->assertRedirect(['action' => 'index']);
 	}
 
-	public function testTypeSpecificAliasStoresTheAlias(): void {
+	public function testTypeSpecificAliasKeepsConfiguredStorageModel(): void {
 		Configure::write('Favorites.models', ['like' => ['Articles' => 'Posts']]);
 		$this->fetchTable('Favorites.Favorites')->deleteAll([]);
 		$this->session(['Auth.User.id' => 1]);
 		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Articles', 1]);
 		$this->assertRedirect();
-		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Articles'])->firstOrFail();
+		$favorite = $this->fetchTable('Favorites.Favorites')->find()->where(['model' => 'Posts'])->firstOrFail();
 		$this->assertSame(1, $favorite->foreign_key);
 		$this->assertSame(1, $favorite->value);
 	}
 
 	public function testLegacyTableAliasIsUpdatedWithoutDuplicate(): void {
-		Configure::write('Favorites.legacyModels', ['Articles' => ['Posts']]);
 		Configure::write('Favorites.models', ['like' => ['Articles' => 'Posts']]);
 		$this->session(['Auth.User.id' => 1]);
 		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Articles', 1]);
@@ -172,6 +172,30 @@ class LikesControllerTest extends TestCase {
 		$favorites = $this->fetchTable('Favorites.Favorites');
 		$this->assertSame(0, $favorites->find()->where(['model' => 'Articles'])->count());
 		$this->assertSame(1, $favorites->find()->where(['model' => 'Posts', 'foreign_key' => 1, 'user_id' => 1])->count());
+	}
+
+	public function testSeparateTableRelationDoesNotOverwriteAnotherRelation(): void {
+		Configure::write('Favorites.models', ['WishlistedPosts' => 'WishlistedPosts', 'BookmarkedPosts' => 'BookmarkedPosts']);
+		$this->getTableLocator()->setConfig('WishlistedPosts', ['className' => Table::class, 'table' => 'posts']);
+		$favorites = $this->fetchTable('Favorites.Favorites');
+		$favorites->add('BookmarkedPosts', 1, 1, -1);
+		$this->session(['Auth.User.id' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'WishlistedPosts', 1]);
+		$this->assertRedirect();
+		$this->assertSame(1, $favorites->find()->where(['model' => 'WishlistedPosts', 'value' => 1])->count());
+		$this->assertSame(1, $favorites->find()->where(['model' => 'BookmarkedPosts', 'value' => -1])->count());
+	}
+
+	public function testQualifiedConfiguredTargetRetainsExistingStorageKey(): void {
+		Configure::write('Favorites.models', ['Articles' => 'Blog.Posts']);
+		$this->getTableLocator()->setConfig('Blog.Posts', ['className' => Table::class, 'table' => 'posts']);
+		$favorites = $this->fetchTable('Favorites.Favorites');
+		$existing = $favorites->add('Blog.Posts', 1, 1, -1);
+		$this->session(['Auth.User.id' => 1]);
+		$this->post(['plugin' => 'Favorites', 'controller' => 'Likes', 'action' => 'like', 'Articles', 1]);
+		$this->assertRedirect();
+		$this->assertSame(1, $favorites->get($existing->get('id'))->get('value'));
+		$this->assertSame(0, $favorites->find()->where(['model' => 'Articles'])->count());
 	}
 
 }

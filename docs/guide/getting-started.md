@@ -12,7 +12,7 @@ Add a public alias to `config/app.php`:
 ],
 ```
 
-The left side is the alias used in URLs and stored in the favorites table. The right side identifies the CakePHP table. Use the same alias in your helpers and behaviors. Do not rename an alias after storing reactions without migrating its stored values.
+Use matching names for this setup: the map key is the helper and URL alias, and the value is the table locator alias stored by plugin controllers. Behaviors default their stored model to the table alias. Matching names keep those paths consistent. Do not change a stored model key without reviewing existing reactions. [Configuration](../reference/configuration#independent-relations-on-one-table) covers separate relations on the same table.
 
 ## Load the helper
 

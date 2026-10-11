@@ -8,7 +8,7 @@ A flat map is available to all reaction types:
 
 ```php
 'Favorites' => [
-    'models' => ['Articles' => 'Blog.Posts'],
+    'models' => ['Posts' => 'Posts'],
 ],
 ```
 
@@ -17,16 +17,54 @@ Type-specific maps take precedence over matching flat aliases:
 ```php
 'Favorites' => [
     'models' => [
-        'star' => ['StarPosts' => 'Posts'],
-        'like' => ['VotePosts' => 'Posts'],
-        'favorite' => ['ReactPosts' => 'Posts'],
+        'star' => ['StarPosts' => 'StarPosts'],
+        'like' => ['VotePosts' => 'VotePosts'],
+        'favorite' => ['ReactPosts' => 'ReactPosts'],
     ],
 ],
 ```
 
-Use these public aliases in helper calls. The plugin controllers resolve the table through the relevant type's map and store the alias. Behaviors detect a configured alias from their registry name, or use the table alias when none is configured. Set their `model` option explicitly if several aliases point to the same table.
+Use matching helper/URL aliases and table locator aliases. Plugin controllers store the configured target string; helpers and action components use the alias supplied by the caller. Behaviors use an explicit `model` option, or default to the table alias. They do not reverse-map a table to the first configured public alias.
 
-Changing aliases in an existing installation requires updating stored `model` values. Earlier controllers may have saved qualified table names, while older Likeable and Favoriteable behaviors used the table alias. See [Upgrading](./upgrading#existing-behavior-aliases) before changing either stored form to your public alias.
+The type-specific example needs table locator entries for `StarPosts`, `VotePosts`, and `ReactPosts`. Giving three public aliases the same target `Posts` does not separate controller storage: all three would store `Posts`.
+
+## Independent relations on one table
+
+Register distinct table locator aliases before using the plugin. Both can instantiate the same table class and access the same physical table:
+
+```php
+use Cake\Core\Configure;
+use Cake\ORM\TableRegistry;
+
+$locator = TableRegistry::getTableLocator();
+$locator->setConfig('WishlistedPosts', ['className' => 'Blog.Posts']);
+$locator->setConfig('BookmarkedPosts', ['className' => 'Blog.Posts']);
+
+Configure::write('Favorites.models', [
+    'WishlistedPosts' => 'WishlistedPosts',
+    'BookmarkedPosts' => 'BookmarkedPosts',
+]);
+```
+
+Here `Blog.Posts` is an existing table class for the physical `posts` table. Both logical instances must attach the relevant behavior; for example, `Favoriteable` may be added in that class's `initialize()`. Its default `model` becomes `WishlistedPosts` or `BookmarkedPosts` according to the locator alias.
+
+Pass the same logical key to the helper:
+
+```php
+echo $this->Favorites->widget('WishlistedPosts', $post->id);
+echo $this->Favorites->widget('BookmarkedPosts', $post->id);
+```
+
+The two reactions remain independent for the same user and post. Associations and finders read only their configured model key, and removal affects only that key. For direct behavior calls, use the corresponding logical table instance.
+
+A qualified locator alias such as `Blog.Posts` defaults the behavior's model to the unqualified `Posts`. If all paths should instead use a qualified storage key, set the behavior's `model` explicitly and use matching helper and map keys:
+
+```php
+$this->addBehavior('Favorites.Favoriteable', ['model' => 'Blog.Posts']);
+Configure::write('Favorites.models', ['Blog.Posts' => 'Blog.Posts']);
+```
+
+Keep existing stored keys when upgrading. There is no automatic alias conversion or lookup across several stored model names. See [Upgrading](./upgrading#stored-model-keys).
 
 ## User identity
 

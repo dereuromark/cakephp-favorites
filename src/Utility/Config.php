@@ -75,35 +75,6 @@ class Config {
 	}
 
 	/**
-	 * @param string $alias
-	 *
-	 * @return list<string>
-	 */
-	public static function storageModels(string $alias): array {
-		$legacyModels = (array)Configure::read('Favorites.legacyModels');
-		$result = [$alias];
-		foreach ((array)($legacyModels[$alias] ?? []) as $legacy) {
-			if (!is_string($legacy) || $legacy === '') {
-				continue;
-			}
-			foreach ($legacyModels as $otherAlias => $names) {
-				if ($otherAlias !== $alias && in_array($legacy, (array)$names, true)) {
-					throw new InvalidArgumentException('Legacy model name is assigned to several aliases: ' . $legacy);
-				}
-			}
-			foreach ([static::TYPE_STAR, static::TYPE_LIKE, static::TYPE_FAVORITE] as $type) {
-				$models = static::models($type);
-				if ($legacy !== $alias && isset($models[$legacy])) {
-					throw new InvalidArgumentException('Legacy model name is an active public alias: ' . $legacy);
-				}
-			}
-			$result[] = $legacy;
-		}
-
-		return array_values(array_unique($result));
-	}
-
-	/**
 	 * @param mixed $value
      *
 	 * @return int|null

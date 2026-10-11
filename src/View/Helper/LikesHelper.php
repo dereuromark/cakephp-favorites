@@ -4,6 +4,7 @@ namespace Favorites\View\Helper;
 
 use BadMethodCallException;
 use Cake\Core\Configure;
+use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -17,6 +18,7 @@ use Favorites\Utility\Config;
 class LikesHelper extends Helper {
 
 	use LocatorAwareTrait;
+	use ModelAwareTrait;
 	use AuthTrait;
 
 	/**
@@ -216,12 +218,12 @@ class LikesHelper extends Helper {
 		}
 
 		$class = $this->getConfig('favoriteClass') ?: 'Favorites.Favorites';
-		$table = $this->fetchTable($class);
+		$table = $this->fetchModel($class);
 
 		$entity = $table->find()
 			->select(['id', 'value'])
 			->where([
-				'model IN' => Config::storageModels($alias),
+				'model' => $alias,
 				'foreign_key' => $id,
 				'user_id' => $uid,
 			])->first();
