@@ -34,7 +34,17 @@ $cspNonce = (string)$this->getRequest()->getAttribute('cspNonce', '');
                 <tr>
                     <td><?= h($comment->model) ?></td>
                     <td><?= h($comment->foreign_key) ?></td>
-                    <td><?= $comment->hasValue('user') ? $this->Html->link($comment->user->username, ['controller' => 'Users', 'action' => 'view', $comment->user->id]) : '' ?></td>
+                    <td>
+                        <?php
+						if ($comment->hasValue('user')) {
+							$userLabel = $comment->user->get('username');
+							if (!is_string($userLabel) || $userLabel === '') {
+								$userLabel = (string)$comment->user->get('id');
+							}
+							echo $this->Html->link($userLabel, ['controller' => 'Users', 'action' => 'view', $comment->user->id]);
+						}
+						?>
+                    </td>
 					<td>
 						<?php echo h($comment->value ?? '-'); ?>
 					</td>

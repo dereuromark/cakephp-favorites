@@ -7,6 +7,7 @@ use Cake\ORM\Behavior;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Favorites\Model\Table\FavoritesTable;
+use Favorites\Utility\Config;
 
 class StarableBehavior extends Behavior {
 
@@ -51,7 +52,7 @@ class StarableBehavior extends Behavior {
 	 */
 	public function initialize(array $config): void {
 		if (!$this->getConfig('model')) {
-			$modelAlias = $this->_table->getAlias();
+			$modelAlias = Config::alias($this->_table->getRegistryAlias(), Config::TYPE_STAR) ?: $this->_table->getAlias();
 			$this->setConfig('model', $modelAlias);
 		}
 		if (!$this->getConfig('modelClass')) {

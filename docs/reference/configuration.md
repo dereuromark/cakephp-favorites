@@ -24,7 +24,7 @@ Type-specific maps take precedence over matching flat aliases:
 ],
 ```
 
-Use matching helper/URL aliases and table locator aliases. Plugin controllers store the configured target string; helpers and action components use the alias supplied by the caller. Behaviors use an explicit `model` option, or default to the table alias. They do not reverse-map a table to the first configured public alias.
+Use matching helper/URL aliases and table locator aliases. Plugin controllers store the configured target string; helpers and action components use the alias supplied by the caller. An explicit behavior `model` option is authoritative. Likeable and Favoriteable default to the table alias. Starable retains its released default: the first matching star alias from the configured map, or the table alias when there is no match. Set its `model` explicitly when several aliases point to one target.
 
 The type-specific example needs table locator entries for `StarPosts`, `VotePosts`, and `ReactPosts`. Giving three public aliases the same target `Posts` does not separate controller storage: all three would store `Posts`.
 
@@ -46,7 +46,7 @@ Configure::write('Favorites.models', [
 ]);
 ```
 
-Here `Blog.Posts` is an existing table class for the physical `posts` table. Both logical instances must attach the relevant behavior; for example, `Favoriteable` may be added in that class's `initialize()`. Its default `model` becomes `WishlistedPosts` or `BookmarkedPosts` according to the locator alias.
+Here `Blog.Posts` is an existing table class for the physical `posts` table. Both logical instances must attach the relevant behavior; for example, `Favoriteable` may be added in that class's `initialize()`. Favoriteable's default `model` becomes `WishlistedPosts` or `BookmarkedPosts` according to the locator alias. When attaching Starable, set `model` explicitly to the intended relation key to avoid selecting the first configured star alias.
 
 Pass the same logical key to the helper:
 
@@ -57,7 +57,7 @@ echo $this->Favorites->widget('BookmarkedPosts', $post->id);
 
 The two reactions remain independent for the same user and post. Associations and finders read only their configured model key, and removal affects only that key. For direct behavior calls, use the corresponding logical table instance.
 
-A qualified locator alias such as `Blog.Posts` defaults the behavior's model to the unqualified `Posts`. If all paths should instead use a qualified storage key, set the behavior's `model` explicitly and use matching helper and map keys:
+For Likeable and Favoriteable, a qualified locator alias such as `Blog.Posts` defaults the stored model to the unqualified `Posts`. Starable first checks its configured alias map. If all paths should instead use a qualified storage key, set the behavior's `model` explicitly and use matching helper and map keys:
 
 ```php
 $this->addBehavior('Favorites.Favoriteable', ['model' => 'Blog.Posts']);
@@ -91,5 +91,7 @@ The unique index covers `model`, `foreign_key`, and `user_id`. `created` records
 ## Helper output
 
 All three helpers create POST forms in the `postLink` block. Render that block from the layout. The default strategy posts to the plugin controller; `strategy => 'action'` posts to the current URL and needs the corresponding component.
+
+The model map is an allowlist for plugin controllers. Action components do not require that map and retain the posted alias as their storage key. The host application must validate allowed aliases, target records and authorization before processing those requests.
 
 Only stars provide a built-in CounterCache option. AJAX transport is an application concern: helpers do not ship a JavaScript client, and the plugin controllers redirect after mutations. Component AJAX callbacks expose view variables; configure your own response rendering when using them.

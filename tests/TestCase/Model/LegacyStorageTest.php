@@ -27,34 +27,36 @@ class LegacyStorageTest extends TestCase {
 	 */
 	public static function behaviors(): array {
 		return [
-			'favorites' => [FavoriteableBehavior::class],
-			'likes' => [LikeableBehavior::class],
-			'stars' => [StarableBehavior::class],
+			'favorites' => [FavoriteableBehavior::class, 'Posts'],
+			'likes' => [LikeableBehavior::class, 'Posts'],
+			'stars' => [StarableBehavior::class, 'wish'],
 		];
 	}
 
 	/**
 	 * @param class-string<\Cake\ORM\Behavior> $behaviorClass
+	 * @param string $expectedModel
 	 *
 	 * @return void
 	 */
 	#[DataProvider('behaviors')]
-	public function testDefaultModelKeepsReleasedTableAlias(string $behaviorClass): void {
+	public function testDefaultModelKeepsReleasedStorageKey(string $behaviorClass, string $expectedModel): void {
 		Configure::write('Favorites.models', ['wish' => 'Blog.Posts', 'bookmark' => 'Blog.Posts']);
 		$table = $this->getTableLocator()->get('Blog.Posts', ['className' => Table::class, 'table' => 'posts']);
 		$behavior = new $behaviorClass($table);
-		$this->assertSame('Posts', $behavior->getConfig('model'));
-		$this->assertSame(['Favorites.model' => 'Posts'], $table->getAssociation('Favorites')->getConditions());
-		$this->assertCount(1, $table->find()->contain('Favorites')->firstOrFail()->get('favorites'));
+		$this->assertSame($expectedModel, $behavior->getConfig('model'));
+		$this->assertSame(['Favorites.model' => $expectedModel], $table->getAssociation('Favorites')->getConditions());
+		$this->assertCount($expectedModel === 'Posts' ? 1 : 0, $table->find()->contain('Favorites')->firstOrFail()->get('favorites'));
 	}
 
 	/**
 	 * @param class-string<\Cake\ORM\Behavior> $behaviorClass
+	 * @param string $expectedModel
 	 *
 	 * @return void
 	 */
 	#[DataProvider('behaviors')]
-	public function testExplicitModelKeepsItsStorageKey(string $behaviorClass): void {
+	public function testExplicitModelKeepsItsStorageKey(string $behaviorClass, string $expectedModel): void {
 		Configure::write('Favorites.models', ['wish' => 'Blog.Posts', 'bookmark' => 'Blog.Posts']);
 		$table = $this->getTableLocator()->get('Blog.Posts', ['className' => Table::class, 'table' => 'posts']);
 		$behavior = new $behaviorClass($table, ['model' => 'WishlistedPosts']);

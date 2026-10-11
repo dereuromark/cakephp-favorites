@@ -41,4 +41,10 @@ class ResetStorageTest extends TestCase {
 		$this->assertSame(1, $favorites->find()->where(['model' => 'StarPosts'])->count());
 	}
 
+	public function testListingWithoutUsernameUsesUserIdAsLinkLabel(): void {
+		$this->get(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'listing']);
+		$this->assertResponseOk();
+		$this->assertResponseContains('/admin/favorites/Users/view/1">1</a>');
+	}
+
 }
