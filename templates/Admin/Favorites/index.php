@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var array<string, int> $models
  */
-$cspNonce = (string)$this->getRequest()->getAttribute('cspNonce', '');
+$cspNonce = (string)($this->getRequest()->getAttribute('cspScriptNonce') ?? $this->getRequest()->getAttribute('cspNonce', ''));
 ?>
 <nav class="actions large-3 medium-4 columns col-sm-4 col-xs-12" id="actions-sidebar">
     <ul class="side-nav nav nav-pills flex-column">
