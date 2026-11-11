@@ -146,16 +146,37 @@ class FavoritesControllerTest extends TestCase {
 	/**
 	 * A custom middleware may still provide the nonce as `cspNonce`.
 	 *
+	 * @param string $action
+	 *
 	 * @return void
 	 */
-	public function testCspNonceFallback(): void {
+	#[DataProvider('cspActionProvider')]
+	public function testCspNonceFallback(string $action): void {
 		$this->withRequestAttribute('cspNonce', 'custom-nonce');
 
-		$this->get(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => 'index']);
+		$this->get(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => $action]);
 
 		$this->assertResponseOk();
 		$this->assertResponseContains('<script nonce="custom-nonce">');
 		$this->assertResponseNotRegExp('/<script(?![^>]*nonce=)/');
+	}
+
+	/**
+	 * @param string $action
+	 *
+	 * @return void
+	 */
+	#[DataProvider('cspActionProvider')]
+	public function testCspScriptNonceTakesPrecedence(string $action): void {
+		$this->withRequestAttribute('cspNonce', 'custom-nonce');
+		$this->withRequestAttribute('cspScriptNonce', 'core-nonce');
+
+		$this->get(['prefix' => 'Admin', 'plugin' => 'Favorites', 'controller' => 'Favorites', 'action' => $action]);
+
+		$this->assertResponseOk();
+		$this->assertResponseContains('<script nonce="core-nonce">');
+		$this->assertResponseNotContains('custom-nonce');
+		$this->assertResponseNotRegExp('/<script(?![^>]*nonce="core-nonce")/');
 	}
 
 	/**
